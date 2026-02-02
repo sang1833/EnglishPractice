@@ -77,8 +77,8 @@ export class LoginComponent {
   private readonly fb = inject(FormBuilder);
 
   protected loginForm: FormGroup = this.fb.group({
-    email: ['', [Validators.required, Validators.email]],
-    password: ['', [Validators.required]]
+    email: ['test@study4.com', [Validators.required, Validators.email]],
+    password: ['Test@123', [Validators.required]]
   });
 
   protected errorMessage = signal<string | null>(null);
