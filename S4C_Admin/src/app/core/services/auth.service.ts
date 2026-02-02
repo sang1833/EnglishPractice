@@ -5,6 +5,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { tap, map } from 'rxjs/operators';
 import { LoginRequest, LoginResponse } from '../models/api.models';
+import { environment } from '../../../environments/environment';
 
 export interface User {
     email: string;
@@ -20,7 +21,7 @@ export interface User {
 export class AuthService {
     private readonly STORAGE_KEY = 's4c_admin_user';
     // Use relative path to leverage proxy
-    private readonly LOGIN_API = '/api/Auth/login';
+    private readonly LOGIN_API = `${environment.apiUrl}/Auth/login`;
 
     currentUser = signal<User | null>(null);
 
