@@ -1,0 +1,43 @@
+{
+    "title": "Cambridge IELTS 18 - Test 1",
+    "slug": "cambridge-ielts-18-test-1",
+    "description": "Full practice test...",
+    "type": "IeltsAcademic",
+    "status": "Published",
+    "duration": 170,
+    "skills": [
+        {
+            "title": "Listening",
+            "skillType": "Listening",
+            "orderIndex": 1,
+            "duration": 30,
+            "sections": [
+                {
+                    "title": "Section 1",
+                    "orderIndex": 1,
+                    "audioUrl": "/audio/file.mp3",
+                    "textContent": "...",
+                    "transcript": "...",
+                    "questionGroups": [
+                        {
+                            "title": "Questions 1-10",
+                            "orderIndex": 1,
+                            "instruction": "Write NO MORE THAN...",
+                            "questionType": "FillInTheBlank",
+                            "questions": [
+                                {
+                                    "orderIndex": 1,
+                                    "content": "Address: 27 _____ Road",
+                                    "options": "[\"A\", \"B\"]",
+                                    "correctAnswer": "Bank",
+                                    "points": 1,
+                                    "explanation": "..."
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

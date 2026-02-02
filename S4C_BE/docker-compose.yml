@@ -1,0 +1,45 @@
+services:
+  s4c-db:
+    image: postgres:15-alpine
+    container_name: s4c-postgres
+    environment:
+      POSTGRES_USER: s4c_user
+      POSTGRES_PASSWORD: s4c_password
+      POSTGRES_DB: study4clone_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - s4c-network
+    restart: always
+
+  s4c-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: s4c-backend
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_HTTP_PORTS=8080
+      - ConnectionStrings__DefaultConnection=Host=s4c-db;Port=5432;Database=study4clone_db;Username=s4c_user;Password=s4c_password;
+      # Disable HTTPS Redirection for Docker internal network if needed, though app handles it
+      # JwtSettings would typically go here too
+      - JwtSettings__SecretKey=SuperSecretKeyForDevelopmentOnly123!
+      - JwtSettings__Issuer=Study4Clone
+      - JwtSettings__Audience=Study4CloneAudience
+    ports:
+      - "5000:8080"
+    depends_on:
+      - s4c-db
+    networks:
+      - s4c-network
+    restart: on-failure
+
+volumes:
+  postgres_data:
+
+
+networks:
+  s4c-network:
+    driver: bridge

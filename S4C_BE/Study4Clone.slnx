@@ -1,0 +1,12 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Study4Clone.Api/Study4Clone.Api.csproj" />
+    <Project Path="src/Study4Clone.Application/Study4Clone.Application.csproj" />
+    <Project Path="src/Study4Clone.Domain/Study4Clone.Domain.csproj" />
+    <Project Path="src/Study4Clone.Infrastructure/Study4Clone.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Study4Clone.IntegrationTests/Study4Clone.IntegrationTests.csproj" />
+    <Project Path="tests/Study4Clone.UnitTests/Study4Clone.UnitTests.csproj" />
+  </Folder>
+</Solution>

@@ -1,0 +1,76 @@
+services:
+  # Database
+  s4c-db:
+    image: postgres:15-alpine
+    container_name: s4c-postgres
+    environment:
+      POSTGRES_USER: s4c_user
+      POSTGRES_PASSWORD: s4c_password
+      POSTGRES_DB: study4clone_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - s4c-network
+    restart: always
+
+  # Backend (.NET 10)
+  s4c-backend:
+    build:
+      context: ./S4C_BE
+      dockerfile: Dockerfile
+    container_name: s4c-backend
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_HTTP_PORTS=8080
+      - ConnectionStrings__DefaultConnection=Host=s4c-db;Port=5432;Database=study4clone_db;Username=s4c_user;Password=s4c_password;
+      - JwtSettings__SecretKey=SuperSecretKeyForDevelopmentOnly123!
+    depends_on:
+      - s4c-db
+    networks:
+      - s4c-network
+    restart: on-failure
+
+  # Frontend (Angular 21)
+  s4c-frontend:
+    build:
+      context: ./S4C_FE
+      dockerfile: Dockerfile
+    container_name: s4c-frontend
+    networks:
+      - s4c-network
+    restart: on-failure
+
+  # Admin (Angular 21)
+  s4c-admin:
+    build:
+      context: ./S4C_Admin
+      dockerfile: Dockerfile
+    container_name: s4c-admin
+    networks:
+      - s4c-network
+    restart: on-failure
+
+  # Gateway (Nginx)
+  s4c-gateway:
+    image: nginx:alpine
+    container_name: s4c-gateway
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx-gateway.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - s4c-frontend
+      - s4c-admin
+      - s4c-backend
+    networks:
+      - s4c-network
+
+volumes:
+  postgres_data:
+
+
+networks:
+  s4c-network:
+    driver: bridge

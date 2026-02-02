@@ -1,0 +1,11 @@
+# AI & Agent Artifacts
+.agent/
+.agents/
+.gemini/
+brain/
+work_log/
+task.md
+implementation_plan.md
+walkthrough.md
+*.log
+.env

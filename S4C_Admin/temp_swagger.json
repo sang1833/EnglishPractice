@@ -1,0 +1,3056 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "Study4Clone API",
+    "description": "IELTS Mock Test Backend API",
+    "version": "v1"
+  },
+  "paths": {
+    "/api/admin/exams/import": {
+      "post": {
+        "tags": [
+          "AdminExams"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ExamImportDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ExamImportDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/ExamImportDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/admin/question-groups": {
+      "post": {
+        "tags": [
+          "AdminQuestionGroups"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/QuestionGroupCreateDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/QuestionGroupCreateDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/QuestionGroupCreateDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/admin/question-groups/{id}": {
+      "put": {
+        "tags": [
+          "AdminQuestionGroups"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/QuestionGroupUpdateDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/QuestionGroupUpdateDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/QuestionGroupUpdateDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/Auth/register": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegisterUserRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegisterUserRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegisterUserRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/Auth/login": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/Auth/me": {
+      "get": {
+        "tags": [
+          "Auth"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/Exams": {
+      "get": {
+        "tags": [
+          "Exams"
+        ],
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 1
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 10
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/ExamStatus"
+            }
+          },
+          {
+            "name": "type",
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/ExamType"
+            }
+          },
+          {
+            "name": "skill",
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/SkillType"
+            }
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExamListDtoPagedList"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExamListDtoPagedList"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExamListDtoPagedList"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Exams"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateExamRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateExamRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateExamRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExamDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExamDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExamDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/Exams/{id}": {
+      "get": {
+        "tags": [
+          "Exams"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExamDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExamDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExamDto"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Exams"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateExamRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateExamRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateExamRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExamDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExamDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExamDto"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Exams"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/Exams/{id}/full": {
+      "get": {
+        "tags": [
+          "Exams"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/Exam"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Exam"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Exam"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/Exams/by-slug/{slug}": {
+      "get": {
+        "tags": [
+          "Exams"
+        ],
+        "parameters": [
+          {
+            "name": "slug",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExamDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExamDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExamDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/files/upload": {
+      "post": {
+        "tags": [
+          "Files"
+        ],
+        "parameters": [
+          {
+            "name": "type",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                }
+              },
+              "encoding": {
+                "file": {
+                  "style": "form"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/Questions/{id}": {
+      "get": {
+        "tags": [
+          "Questions"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Questions"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateQuestionRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateQuestionRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateQuestionRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Questions"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/Questions/group/{groupId}": {
+      "post": {
+        "tags": [
+          "Questions"
+        ],
+        "parameters": [
+          {
+            "name": "groupId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateQuestionRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateQuestionRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateQuestionRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/Questions/group/{groupId}/bulk": {
+      "post": {
+        "tags": [
+          "Questions"
+        ],
+        "parameters": [
+          {
+            "name": "groupId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/CreateQuestionRequest"
+                }
+              }
+            },
+            "text/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/CreateQuestionRequest"
+                }
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/CreateQuestionRequest"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/Sections/{id}": {
+      "get": {
+        "tags": [
+          "Sections"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/Sections/skill/{skillId}": {
+      "post": {
+        "tags": [
+          "Sections"
+        ],
+        "parameters": [
+          {
+            "name": "skillId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateExamSectionRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateExamSectionRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateExamSectionRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/Skills/exam/{examId}": {
+      "get": {
+        "tags": [
+          "Skills"
+        ],
+        "parameters": [
+          {
+            "name": "examId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ExamSkillListDto"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ExamSkillListDto"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ExamSkillListDto"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Skills"
+        ],
+        "parameters": [
+          {
+            "name": "examId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateExamSkillRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateExamSkillRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateExamSkillRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExamSkillListDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExamSkillListDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExamSkillListDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/Skills/{id}": {
+      "get": {
+        "tags": [
+          "Skills"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExamSkillDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExamSkillDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExamSkillDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/Statistics": {
+      "get": {
+        "tags": [
+          "Statistics"
+        ],
+        "parameters": [
+          {
+            "name": "Period",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "ExamType",
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/ExamType"
+            }
+          },
+          {
+            "name": "Skill",
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/SkillType"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/TestAttempts/user/{userId}": {
+      "get": {
+        "tags": [
+          "TestAttempts"
+        ],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "PageSize",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "FromDate",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "ToDate",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "SortOrder",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/TestAttemptListDtoPagedList"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TestAttemptListDtoPagedList"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TestAttemptListDtoPagedList"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/TestAttempts/{id}/exam": {
+      "get": {
+        "tags": [
+          "TestAttempts"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/Exam"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Exam"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Exam"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/TestAttempts/{id}": {
+      "get": {
+        "tags": [
+          "TestAttempts"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/TestAttemptDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TestAttemptDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TestAttemptDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/TestAttempts/{id}/result": {
+      "get": {
+        "tags": [
+          "TestAttempts"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/TestResultDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TestResultDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TestResultDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/TestAttempts/start": {
+      "post": {
+        "tags": [
+          "TestAttempts"
+        ],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StartTestRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StartTestRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/StartTestRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/TestAttemptDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TestAttemptDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TestAttemptDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/TestAttempts/{id}/submit": {
+      "post": {
+        "tags": [
+          "TestAttempts"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SubmitTestRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SubmitTestRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/SubmitTestRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/TestResultDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TestResultDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TestResultDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/TestAttempts/{id}/abandon": {
+      "post": {
+        "tags": [
+          "TestAttempts"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/TestAttempts/{id}/pause": {
+      "post": {
+        "tags": [
+          "TestAttempts"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PauseTestRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PauseTestRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/PauseTestRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/Users/profile": {
+      "get": {
+        "tags": [
+          "Users"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Users"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateUserProfileRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateUserProfileRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateUserProfileRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/Users/change-password": {
+      "put": {
+        "tags": [
+          "Users"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChangePasswordRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChangePasswordRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChangePasswordRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "AttemptStatus": {
+        "enum": [
+          "InProgress",
+          "Pending",
+          "Completed",
+          "Abandoned"
+        ],
+        "type": "string"
+      },
+      "ChangePasswordRequest": {
+        "type": "object",
+        "properties": {
+          "oldPassword": {
+            "type": "string",
+            "nullable": true
+          },
+          "newPassword": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "CreateExamRequest": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "nullable": true
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "thumbnailUrl": {
+            "type": "string",
+            "nullable": true
+          },
+          "type": {
+            "$ref": "#/components/schemas/ExamType"
+          },
+          "duration": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
+      "CreateExamSectionRequest": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "nullable": true
+          },
+          "orderIndex": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "textContent": {
+            "type": "string",
+            "nullable": true
+          },
+          "audioUrl": {
+            "type": "string",
+            "nullable": true
+          },
+          "imageUrl": {
+            "type": "string",
+            "nullable": true
+          },
+          "transcript": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "CreateExamSkillRequest": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "nullable": true
+          },
+          "skill": {
+            "$ref": "#/components/schemas/SkillType"
+          },
+          "orderIndex": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "duration": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
+      "CreateQuestionRequest": {
+        "type": "object",
+        "properties": {
+          "orderIndex": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "content": {
+            "type": "string",
+            "nullable": true
+          },
+          "options": {
+            "type": "string",
+            "nullable": true
+          },
+          "correctAnswer": {
+            "type": "string",
+            "nullable": true
+          },
+          "explanation": {
+            "type": "string",
+            "nullable": true
+          },
+          "points": {
+            "type": "number",
+            "format": "double"
+          }
+        },
+        "additionalProperties": false
+      },
+      "Exam": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "title": {
+            "type": "string",
+            "nullable": true
+          },
+          "slug": {
+            "type": "string",
+            "nullable": true
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "thumbnailUrl": {
+            "type": "string",
+            "nullable": true
+          },
+          "type": {
+            "$ref": "#/components/schemas/ExamType"
+          },
+          "status": {
+            "$ref": "#/components/schemas/ExamStatus"
+          },
+          "duration": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "skills": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ExamSkill"
+            },
+            "nullable": true
+          },
+          "attempts": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TestAttempt"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "ExamDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "title": {
+            "type": "string",
+            "nullable": true
+          },
+          "slug": {
+            "type": "string",
+            "nullable": true
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "thumbnailUrl": {
+            "type": "string",
+            "nullable": true
+          },
+          "type": {
+            "$ref": "#/components/schemas/ExamType"
+          },
+          "status": {
+            "$ref": "#/components/schemas/ExamStatus"
+          },
+          "duration": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "additionalProperties": false
+      },
+      "ExamImportDto": {
+        "required": [
+          "title"
+        ],
+        "type": "object",
+        "properties": {
+          "title": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "slug": {
+            "type": "string",
+            "nullable": true
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "thumbnailUrl": {
+            "type": "string",
+            "nullable": true
+          },
+          "type": {
+            "$ref": "#/components/schemas/ExamType"
+          },
+          "status": {
+            "$ref": "#/components/schemas/ExamStatus"
+          },
+          "duration": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "skills": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ExamSkillImportDto"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "ExamListDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "title": {
+            "type": "string",
+            "nullable": true
+          },
+          "slug": {
+            "type": "string",
+            "nullable": true
+          },
+          "thumbnailUrl": {
+            "type": "string",
+            "nullable": true
+          },
+          "type": {
+            "$ref": "#/components/schemas/ExamType"
+          },
+          "status": {
+            "$ref": "#/components/schemas/ExamStatus"
+          },
+          "duration": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "availableSkills": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "targetSkill": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "ExamListDtoPagedList": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ExamListDto"
+            },
+            "nullable": true
+          },
+          "page": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "pageSize": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "totalCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "totalPages": {
+            "type": "integer",
+            "format": "int32",
+            "readOnly": true
+          },
+          "hasPreviousPage": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "hasNextPage": {
+            "type": "boolean",
+            "readOnly": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "ExamSection": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "skillId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "title": {
+            "type": "string",
+            "nullable": true
+          },
+          "orderIndex": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "textContent": {
+            "type": "string",
+            "nullable": true
+          },
+          "audioUrl": {
+            "type": "string",
+            "nullable": true
+          },
+          "imageUrl": {
+            "type": "string",
+            "nullable": true
+          },
+          "transcript": {
+            "type": "string",
+            "nullable": true
+          },
+          "skill": {
+            "$ref": "#/components/schemas/ExamSkill"
+          },
+          "groups": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/QuestionGroup"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "ExamSectionDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "skillId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "title": {
+            "type": "string",
+            "nullable": true
+          },
+          "orderIndex": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "textContent": {
+            "type": "string",
+            "nullable": true
+          },
+          "audioUrl": {
+            "type": "string",
+            "nullable": true
+          },
+          "imageUrl": {
+            "type": "string",
+            "nullable": true
+          },
+          "transcript": {
+            "type": "string",
+            "nullable": true
+          },
+          "groups": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/QuestionGroupDto"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "ExamSectionImportDto": {
+        "required": [
+          "title"
+        ],
+        "type": "object",
+        "properties": {
+          "title": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "orderIndex": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "audioUrl": {
+            "type": "string",
+            "nullable": true
+          },
+          "textContent": {
+            "type": "string",
+            "nullable": true
+          },
+          "transcript": {
+            "type": "string",
+            "nullable": true
+          },
+          "imageUrl": {
+            "type": "string",
+            "nullable": true
+          },
+          "questionGroups": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/QuestionGroupImportDto"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "ExamSkill": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "examId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "title": {
+            "type": "string",
+            "nullable": true
+          },
+          "skill": {
+            "$ref": "#/components/schemas/SkillType"
+          },
+          "orderIndex": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "duration": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "exam": {
+            "$ref": "#/components/schemas/Exam"
+          },
+          "sections": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ExamSection"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "ExamSkillDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "examId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "title": {
+            "type": "string",
+            "nullable": true
+          },
+          "skill": {
+            "$ref": "#/components/schemas/SkillType"
+          },
+          "orderIndex": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "duration": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "sections": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ExamSectionDto"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "ExamSkillImportDto": {
+        "required": [
+          "title"
+        ],
+        "type": "object",
+        "properties": {
+          "title": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "skill": {
+            "$ref": "#/components/schemas/SkillType"
+          },
+          "orderIndex": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "duration": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "sections": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ExamSectionImportDto"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "ExamSkillListDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "title": {
+            "type": "string",
+            "nullable": true
+          },
+          "skill": {
+            "$ref": "#/components/schemas/SkillType"
+          },
+          "orderIndex": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "duration": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "sectionCount": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
+      "ExamStatus": {
+        "enum": [
+          "Draft",
+          "Published",
+          "Archived"
+        ],
+        "type": "string"
+      },
+      "ExamType": {
+        "enum": [
+          "IeltsAcademic",
+          "IeltsGeneral",
+          "Toeic",
+          "Other"
+        ],
+        "type": "string"
+      },
+      "LoginRequest": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "nullable": true
+          },
+          "password": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "PauseTestRequest": {
+        "type": "object",
+        "properties": {
+          "answers": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SubmitAnswerRequest"
+            },
+            "nullable": true
+          },
+          "timeRemaining": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "Question": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "groupId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "orderIndex": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "content": {
+            "type": "string",
+            "nullable": true
+          },
+          "options": {
+            "type": "string",
+            "nullable": true
+          },
+          "correctAnswer": {
+            "type": "string",
+            "nullable": true
+          },
+          "explanation": {
+            "type": "string",
+            "nullable": true
+          },
+          "points": {
+            "type": "number",
+            "format": "double"
+          },
+          "group": {
+            "$ref": "#/components/schemas/QuestionGroup"
+          },
+          "userAnswers": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UserAnswer"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "QuestionDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "groupId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "orderIndex": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "content": {
+            "type": "string",
+            "nullable": true
+          },
+          "options": {
+            "type": "string",
+            "nullable": true
+          },
+          "correctAnswer": {
+            "type": "string",
+            "nullable": true
+          },
+          "explanation": {
+            "type": "string",
+            "nullable": true
+          },
+          "points": {
+            "type": "number",
+            "format": "double"
+          }
+        },
+        "additionalProperties": false
+      },
+      "QuestionGroup": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "sectionId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "title": {
+            "type": "string",
+            "nullable": true
+          },
+          "instruction": {
+            "type": "string",
+            "nullable": true
+          },
+          "questionType": {
+            "$ref": "#/components/schemas/QuestionType"
+          },
+          "orderIndex": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "imageUrl": {
+            "type": "string",
+            "nullable": true
+          },
+          "textContent": {
+            "type": "string",
+            "nullable": true
+          },
+          "audioUrl": {
+            "type": "string",
+            "nullable": true
+          },
+          "section": {
+            "$ref": "#/components/schemas/ExamSection"
+          },
+          "questions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Question"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "QuestionGroupCreateDto": {
+        "required": [
+          "sectionId"
+        ],
+        "type": "object",
+        "properties": {
+          "sectionId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "title": {
+            "type": "string",
+            "nullable": true
+          },
+          "instruction": {
+            "type": "string",
+            "nullable": true
+          },
+          "questionType": {
+            "$ref": "#/components/schemas/QuestionType"
+          },
+          "orderIndex": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "imageUrl": {
+            "type": "string",
+            "nullable": true
+          },
+          "textContent": {
+            "type": "string",
+            "nullable": true
+          },
+          "audioUrl": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "QuestionGroupDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "sectionId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "title": {
+            "type": "string",
+            "nullable": true
+          },
+          "instruction": {
+            "type": "string",
+            "nullable": true
+          },
+          "questionType": {
+            "$ref": "#/components/schemas/QuestionType"
+          },
+          "orderIndex": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "questions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/QuestionDto"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "QuestionGroupImportDto": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "nullable": true
+          },
+          "instruction": {
+            "type": "string",
+            "nullable": true
+          },
+          "questionType": {
+            "$ref": "#/components/schemas/QuestionType"
+          },
+          "orderIndex": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "imageUrl": {
+            "type": "string",
+            "nullable": true
+          },
+          "textContent": {
+            "type": "string",
+            "nullable": true
+          },
+          "audioUrl": {
+            "type": "string",
+            "nullable": true
+          },
+          "questions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/QuestionImportDto"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "QuestionGroupUpdateDto": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "nullable": true
+          },
+          "instruction": {
+            "type": "string",
+            "nullable": true
+          },
+          "orderIndex": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "imageUrl": {
+            "type": "string",
+            "nullable": true
+          },
+          "textContent": {
+            "type": "string",
+            "nullable": true
+          },
+          "audioUrl": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "QuestionImportDto": {
+        "type": "object",
+        "properties": {
+          "orderIndex": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "content": {
+            "type": "string",
+            "nullable": true
+          },
+          "options": {
+            "type": "string",
+            "nullable": true
+          },
+          "correctAnswer": {
+            "type": "string",
+            "nullable": true
+          },
+          "points": {
+            "type": "number",
+            "format": "double"
+          },
+          "explanation": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "QuestionResultDto": {
+        "type": "object",
+        "properties": {
+          "questionId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "questionNumber": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "questionContent": {
+            "type": "string",
+            "nullable": true
+          },
+          "userAnswer": {
+            "type": "string",
+            "nullable": true
+          },
+          "correctAnswer": {
+            "type": "string",
+            "nullable": true
+          },
+          "isCorrect": {
+            "type": "boolean"
+          },
+          "pointsEarned": {
+            "type": "number",
+            "format": "double"
+          },
+          "maxPoints": {
+            "type": "number",
+            "format": "double"
+          },
+          "explanation": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "QuestionType": {
+        "enum": [
+          "MultipleChoice",
+          "FillInTheBlank",
+          "TrueFalseNotGiven",
+          "MatchingHeadings",
+          "DropDown",
+          "Essay",
+          "SpeakingRecording"
+        ],
+        "type": "string"
+      },
+      "RegisterUserRequest": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "nullable": true
+          },
+          "password": {
+            "type": "string",
+            "nullable": true
+          },
+          "fullName": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "SkillResultDto": {
+        "type": "object",
+        "properties": {
+          "skill": {
+            "$ref": "#/components/schemas/SkillType"
+          },
+          "skillName": {
+            "type": "string",
+            "nullable": true
+          },
+          "correctCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "totalQuestions": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "bandScore": {
+            "type": "number",
+            "format": "double"
+          }
+        },
+        "additionalProperties": false
+      },
+      "SkillType": {
+        "enum": [
+          "Listening",
+          "Reading",
+          "Writing",
+          "Speaking"
+        ],
+        "type": "string"
+      },
+      "StartTestRequest": {
+        "type": "object",
+        "properties": {
+          "examId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "forceNew": {
+            "type": "boolean"
+          },
+          "selectedSkills": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SkillType"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "SubmitAnswerRequest": {
+        "type": "object",
+        "properties": {
+          "questionId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "textContent": {
+            "type": "string",
+            "nullable": true
+          },
+          "selectedOptions": {
+            "type": "string",
+            "nullable": true
+          },
+          "audioUrl": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "SubmitTestRequest": {
+        "type": "object",
+        "properties": {
+          "answers": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SubmitAnswerRequest"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "TestAttempt": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "userId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "examId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "startedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "completedAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "status": {
+            "$ref": "#/components/schemas/AttemptStatus"
+          },
+          "timeRemaining": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "selectedSkills": {
+            "type": "string",
+            "nullable": true
+          },
+          "overallScore": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "listeningScore": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "readingScore": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "writingScore": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "speakingScore": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "correctQuestionCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "totalQuestionCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "user": {
+            "$ref": "#/components/schemas/User"
+          },
+          "exam": {
+            "$ref": "#/components/schemas/Exam"
+          },
+          "answers": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UserAnswer"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "TestAttemptDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "userId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "examId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "examTitle": {
+            "type": "string",
+            "nullable": true
+          },
+          "startedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "completedAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "status": {
+            "$ref": "#/components/schemas/AttemptStatus"
+          },
+          "overallScore": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "listeningScore": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "readingScore": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "writingScore": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "speakingScore": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "timeRemaining": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "selectedSkills": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "TestAttemptListDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "examId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "examTitle": {
+            "type": "string",
+            "nullable": true
+          },
+          "startedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "completedAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "status": {
+            "$ref": "#/components/schemas/AttemptStatus"
+          },
+          "overallScore": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "selectedSkills": {
+            "type": "string",
+            "nullable": true
+          },
+          "isFullTest": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      },
+      "TestAttemptListDtoPagedList": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TestAttemptListDto"
+            },
+            "nullable": true
+          },
+          "page": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "pageSize": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "totalCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "totalPages": {
+            "type": "integer",
+            "format": "int32",
+            "readOnly": true
+          },
+          "hasPreviousPage": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "hasNextPage": {
+            "type": "boolean",
+            "readOnly": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "TestResultDto": {
+        "type": "object",
+        "properties": {
+          "attemptId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "examId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "examTitle": {
+            "type": "string",
+            "nullable": true
+          },
+          "overallBandScore": {
+            "type": "number",
+            "format": "double"
+          },
+          "totalCorrect": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "totalQuestions": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "percentageScore": {
+            "type": "number",
+            "format": "double"
+          },
+          "startedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "completedAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "timeTaken": {
+            "type": "string",
+            "format": "date-span"
+          },
+          "skillResults": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SkillResultDto"
+            },
+            "nullable": true
+          },
+          "questionResults": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/QuestionResultDto"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "UpdateExamRequest": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "nullable": true
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "thumbnailUrl": {
+            "type": "string",
+            "nullable": true
+          },
+          "type": {
+            "$ref": "#/components/schemas/ExamType"
+          },
+          "status": {
+            "$ref": "#/components/schemas/ExamStatus"
+          },
+          "duration": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "UpdateQuestionRequest": {
+        "type": "object",
+        "properties": {
+          "orderIndex": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "content": {
+            "type": "string",
+            "nullable": true
+          },
+          "options": {
+            "type": "string",
+            "nullable": true
+          },
+          "correctAnswer": {
+            "type": "string",
+            "nullable": true
+          },
+          "explanation": {
+            "type": "string",
+            "nullable": true
+          },
+          "points": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "UpdateUserProfileRequest": {
+        "type": "object",
+        "properties": {
+          "fullName": {
+            "type": "string",
+            "nullable": true
+          },
+          "avatarUrl": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "User": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "email": {
+            "type": "string",
+            "nullable": true
+          },
+          "passwordHash": {
+            "type": "string",
+            "nullable": true
+          },
+          "fullName": {
+            "type": "string",
+            "nullable": true
+          },
+          "avatarUrl": {
+            "type": "string",
+            "nullable": true
+          },
+          "role": {
+            "$ref": "#/components/schemas/UserRole"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "attempts": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TestAttempt"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "UserAnswer": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "attemptId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "questionId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "audioUrl": {
+            "type": "string",
+            "nullable": true
+          },
+          "textContent": {
+            "type": "string",
+            "nullable": true
+          },
+          "selectedOptions": {
+            "type": "string",
+            "nullable": true
+          },
+          "isCorrect": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "scoreEarned": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "feedback": {
+            "type": "string",
+            "nullable": true
+          },
+          "attempt": {
+            "$ref": "#/components/schemas/TestAttempt"
+          },
+          "question": {
+            "$ref": "#/components/schemas/Question"
+          }
+        },
+        "additionalProperties": false
+      },
+      "UserRole": {
+        "enum": [
+          "User",
+          "Admin",
+          "ContentCreator"
+        ],
+        "type": "string"
+      }
+    },
+    "securitySchemes": {
+      "Bearer": {
+        "type": "http",
+        "description": "Enter your JWT token",
+        "scheme": "Bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  },
+  "security": [
+    {
+      "Bearer": [ ]
+    }
+  ]
+}

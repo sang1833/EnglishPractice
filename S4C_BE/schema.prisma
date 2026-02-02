@@ -1,0 +1,221 @@
+// This is your Prisma schema file.
+// NOTE: This schema serves as a REFERENCE specification for a .NET Backend using Entity Framework Core.
+// Agents should map these models to C# POCO classes.
+//
+// Key Mappings for .NET/EF Core:
+// - `String @id @default(uuid())` -> `Guid Id`
+// - `Json` -> `string` (serialized JSON) or `JsonDocument` depending on usage.
+// - `Enum` -> C# `enum` types.
+//
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql" // or "mysql"
+  url      = env("DATABASE_URL")
+}
+
+// --------------------------------------------------------
+// USER & AUTHENTICATION
+// --------------------------------------------------------
+
+enum UserRole {
+  USER
+  ADMIN
+  CONTENT_CREATOR
+}
+
+model User {
+  id            String    @id @default(uuid())
+  email         String    @unique
+  passwordHash  String?
+  fullName      String?
+  avatarUrl     String?
+  role          UserRole  @default(USER)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  attempts      TestAttempt[]
+  
+  // Potential: Bookmarks, Notes, etc.
+}
+
+// --------------------------------------------------------
+// EXAM & CONTENT STRUCTURE
+// --------------------------------------------------------
+
+enum ExamType {
+  IELTS_ACADEMIC
+  IELTS_GENERAL
+  TOEIC
+  OTHER
+}
+
+enum ExamStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+model Exam {
+  id          String      @id @default(uuid())
+  title       String
+  slug        String      @unique
+  description String?      @db.Text
+  thumbnailUrl String?
+  type        ExamType    @default(IELTS_ACADEMIC)
+  status      ExamStatus  @default(DRAFT)
+  duration    Int         // Total duration in minutes (optional guideline)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  skills      ExamSkill[]
+  attempts    TestAttempt[]
+}
+
+enum SkillType {
+  LISTENING
+  READING
+  WRITING
+  SPEAKING
+}
+
+// A Skill corresponds to "Reading", "Listening", etc.
+model ExamSkill {
+  id          String      @id @default(uuid())
+  examId      String
+  exam        Exam        @relation(fields: [examId], references: [id], onDelete: Cascade)
+  
+  title       String      // e.g., "Reading"
+  skill       SkillType
+  orderIndex  Int         // 1, 2, 3, 4
+  duration    Int         // Time limit for this skill in minutes (e.g. 60 for Reading)
+  
+  sections    ExamSection[] // The logical groupings (Passages, Audio parts)
+}
+
+// Represents a "Passage" (Reading) or "Part" (Listening)
+// It usually holds the Shared Material (Text, Audio, Image)
+model ExamSection {
+  id          String      @id @default(uuid())
+  skillId     String
+  skill       ExamSkill   @relation(fields: [skillId], references: [id], onDelete: Cascade)
+  
+  title       String      // e.g., "Passage 1: The History of Tea" or "Part 1"
+  orderIndex  Int
+  
+  // Resource Content
+  textContent String?     @db.Text // HTML content for Reading Passage
+  audioUrl    String?     // URL for Listening Audio
+  imageUrl    String?     // Chart/Graph for Writing Task 1
+  transcript  String?     @db.Text // Audio transcript for Listening
+  
+  groups      QuestionGroup[]
+}
+
+// Represents a cluster of questions with shared instruction/type
+// e.g., "Questions 1-5: True/False/Not Given"
+model QuestionGroup {
+  id           String      @id @default(uuid())
+  sectionId    String
+  section      ExamSection @relation(fields: [sectionId], references: [id], onDelete: Cascade)
+  
+  title        String?           // e.g., "Questions 1-5"
+  instruction  String?           @db.Text // e.g., "Do the following statements agree with the information..."
+  questionType QuestionType      // Define type at group level if all questions share it
+  orderIndex   Int
+  
+  questions    Question[]
+}
+
+enum QuestionType {
+  MULTIPLE_CHOICE     // ABCD
+  FILL_IN_THE_BLANK   // Text input
+  TRUE_FALSE_NOT_GIVEN // Custom Dropdown/Radio
+  MATCHING_HEADINGS   // Drag and drop / Matching
+  DROP_DOWN           // Select from list
+  ESSAY               // Long text (Writing)
+  SPEAKING_RECORDING  // Audio upload schema
+}
+
+model Question {
+  id            String             @id @default(uuid())
+  groupId       String
+  group         QuestionGroup      @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  
+  orderIndex    Int                // Global question number (e.g., 1 to 40)
+  
+  content       String?            @db.Text // The actual question stem (e.g. "The request was refused.")
+  
+  // JSON Fields for flexibility
+  // Example for MCQ: [{"label": "A", "text": "Answer 1"}, {"label": "B", "text": "Answer 2"}]
+  options       Json?
+  
+  // Example: "A" or ["A", "C"] or "Answer Text"
+  // For FillInBlank: ["answer1", "answer 1 variant"] for fuzzy matching
+  correctAnswer Json
+  
+  explanation   String?            @db.Text // Shown after review
+  points        Float              @default(1.0) // Usually 1 point per question in IELTS
+  
+  userAnswers   UserAnswer[]
+}
+
+// --------------------------------------------------------
+// EXAM ATTEMPTS & RESULTS
+// --------------------------------------------------------
+
+enum AttemptStatus {
+  IN_PROGRESS
+  COMPLETED
+  ABANDONED
+  PENDING     // Paused / Saved Draft
+}
+
+model TestAttempt {
+  id          String        @id @default(uuid())
+  userId      String
+  user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  examId      String
+  exam        Exam          @relation(fields: [examId], references: [id])
+  
+  startedAt   DateTime      @default(now())
+  completedAt DateTime?
+  status      AttemptStatus @default(IN_PROGRESS)
+  
+  timeRemaining Int?        // Remaining seconds when paused/saved
+
+  
+  // Scores
+  overallScore  Float?      // Band Score (e.g., 6.5)
+  listeningScore Float?
+  readingScore   Float?
+  writingScore   Float?
+  speakingScore  Float?
+  
+  answers       UserAnswer[]
+}
+
+model UserAnswer {
+  id            String      @id @default(uuid())
+  attemptId     String
+  attempt       TestAttempt @relation(fields: [attemptId], references: [id], onDelete: Cascade)
+  
+  questionId    String
+  question      Question    @relation(fields: [questionId], references: [id])
+  
+  // The user's input
+  // String for text input, Enum key for MCQ, URL for speaking recording
+  audioUrl      String?     // For speaking
+  textContent   String?     // For writing or blank filling
+  selectedOptions Json?     // For MCQ (e.g. ["A"])
+  
+  isCorrect     Boolean?    // Null if not graded yet (Writing/Speaking)
+  scoreEarned   Float?      @default(0)
+  
+  feedback      String?     @db.Text // Teacher's feedback for Writing/Speaking
+}

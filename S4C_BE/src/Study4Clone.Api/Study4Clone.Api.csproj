@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.2" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.2">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="8.1.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Study4Clone.Domain\Study4Clone.Domain.csproj" />
+    <ProjectReference Include="..\Study4Clone.Application\Study4Clone.Application.csproj" />
+    <ProjectReference Include="..\Study4Clone.Infrastructure\Study4Clone.Infrastructure.csproj" />
+  </ItemGroup>
+
+</Project>

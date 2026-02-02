@@ -1,0 +1,43 @@
+# --- General ---
+.DS_Store
+Thumbs.db
+*.log
+github_deploy_key
+github_deploy_key.pub
+
+# --- IDEs & Editors ---
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln.docstates
+*.user
+.vs/
+
+# --- AI & Agent Artifacts ---
+.agent/
+.agents/
+.gemini/
+brain/
+work_log/
+task.md
+implementation_plan.md
+walkthrough.md
+*.log
+
+# --- .NET (S4C_BE) ---
+bin/
+obj/
+publish/
+**/TestResults/
+*.mdf
+*.ldf
+
+# --- Angular (S4C_FE) ---
+node_modules/
+dist/
+.sass-cache/
+connect.lock
+coverage/
+test-report.xml

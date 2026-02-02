@@ -1,0 +1,106 @@
+"passwordHash": {
+            "type": "string",
+            "nullable": true
+          },
+          "fullName": {
+            "type": "string",
+            "nullable": true
+          },
+          "avatarUrl": {
+            "type": "string",
+            "nullable": true
+          },
+          "role": {
+            "$ref": "#/components/schemas/UserRole"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "attempts": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TestAttempt"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "UserAnswer": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "attemptId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "questionId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "audioUrl": {
+            "type": "string",
+            "nullable": true
+          },
+          "textContent": {
+            "type": "string",
+            "nullable": true
+          },
+          "selectedOptions": {
+            "type": "string",
+            "nullable": true
+          },
+          "isCorrect": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "scoreEarned": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "feedback": {
+            "type": "string",
+            "nullable": true
+          },
+          "attempt": {
+            "$ref": "#/components/schemas/TestAttempt"
+          },
+          "question": {
+            "$ref": "#/components/schemas/Question"
+          }
+        },
+        "additionalProperties": false
+      },
+      "UserRole": {
+        "enum": [
+          "User",
+          "Admin",
+          "ContentCreator"
+        ],
+        "type": "string"
+      }
+    },
+    "securitySchemes": {
+      "Bearer": {
+        "type": "http",
+        "description": "Enter your JWT token",
+        "scheme": "Bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  },
+  "security": [
+    {
+      "Bearer": [ ]
+    }
+  ]
+}
