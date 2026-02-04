@@ -2,15 +2,16 @@ import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
+import { TranslateModule } from '@ngx-translate/core';
 import { AuthService } from '../../../core/services/auth.service';
 
 @Component({
   selector: 'app-register',
-  imports: [CommonModule, ReactiveFormsModule, RouterLink],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink, TranslateModule],
   template: `
     <div class="text-center">
-      <h2 class="text-3xl font-semibold text-text mb-2">Create Account</h2>
-      <p class="text-muted mb-6">Start your IELTS preparation journey</p>
+      <h2 class="text-3xl font-semibold text-text mb-2">{{ 'AUTH.REGISTER_TITLE' | translate }}</h2>
+      <p class="text-muted mb-6">{{ 'AUTH.REGISTER_SUBTITLE' | translate }}</p>
 
       @if (errorMessage()) {
         <div class="bg-error/10 text-error p-3 rounded-md mb-4 flex items-center gap-2 text-sm border border-error">
@@ -21,7 +22,7 @@ import { AuthService } from '../../../core/services/auth.service';
 
       <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="text-left">
         <div class="mb-4">
-          <label for="fullName" class="block font-medium text-text mb-2 text-sm">Full Name</label>
+          <label for="fullName" class="block font-medium text-text mb-2 text-sm">{{ 'AUTH.NAME_LABEL' | translate }}</label>
           <input
             type="text"
             id="fullName"
@@ -36,7 +37,7 @@ import { AuthService } from '../../../core/services/auth.service';
         </div>
 
         <div class="mb-4">
-          <label for="email" class="block font-medium text-text mb-2 text-sm">Email</label>
+          <label for="email" class="block font-medium text-text mb-2 text-sm">{{ 'AUTH.EMAIL_LABEL' | translate }}</label>
           <input
             type="email"
             id="email"
@@ -51,7 +52,7 @@ import { AuthService } from '../../../core/services/auth.service';
         </div>
 
         <div class="mb-4">
-          <label for="password" class="block font-medium text-text mb-2 text-sm">Password</label>
+          <label for="password" class="block font-medium text-text mb-2 text-sm">{{ 'AUTH.PASSWORD_LABEL' | translate }}</label>
           <input
             type="password"
             id="password"
@@ -66,7 +67,7 @@ import { AuthService } from '../../../core/services/auth.service';
         </div>
 
         <div class="mb-4">
-          <label for="confirmPassword" class="block font-medium text-text mb-2 text-sm">Confirm Password</label>
+          <label for="confirmPassword" class="block font-medium text-text mb-2 text-sm">{{ 'AUTH.CONFIRM_PASSWORD_LABEL' | translate }}</label>
           <input
             type="password"
             id="confirmPassword"
@@ -87,16 +88,16 @@ import { AuthService } from '../../../core/services/auth.service';
         >
           @if (authService.isLoading()) {
             <span class="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
-            Creating account...
+             {{ 'COMMON.LOADING' | translate }}
           } @else {
-            Create Account
+             {{ 'AUTH.SIGN_UP_BUTTON' | translate }}
           }
         </button>
       </form>
 
       <p class="mt-6 text-muted text-sm">
-        Already have an account?
-        <a routerLink="/auth/login" class="text-primary no-underline font-medium hover:underline">Sign in</a>
+        {{ 'AUTH.HAVE_ACCOUNT' | translate }}
+        <a routerLink="/auth/login" class="text-primary no-underline font-medium hover:underline">{{ 'AUTH.SIGN_IN_LINK' | translate }}</a>
       </p>
     </div>
   `

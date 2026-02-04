@@ -1,11 +1,12 @@
 import { Component, input, output, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { TranslateModule } from '@ngx-translate/core';
 import { QuestionGroup, SubmitAnswerRequest, QuestionType } from '../../../core/models';
 import { ThemeService } from '../../../core/services/theme.service';
 @Component({
   selector: 'app-question-group',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, TranslateModule],
   template: `
     <div class="bg-surface rounded-lg p-6 mb-4 shadow-[var(--shadow-sm)]" [class.border-2]="isGameMode()" [class.border-border]="isGameMode()">
       <header class="mb-6 pb-4 border-b border-border">
@@ -86,7 +87,7 @@ import { ThemeService } from '../../../core/services/theme.service';
                           [checked]="getAnswer(question.id)?.selectedOptions === option"
                           (change)="onSelectOption(question.id, option)"
                         />
-                        <span class="text-text">{{ option }}</span>
+                        <span class="text-text">{{ 'TEST.' + option.replace(' ', '_') | translate }}</span>
                       </label>
                     }
                   </div>
@@ -101,7 +102,7 @@ import { ThemeService } from '../../../core/services/theme.service';
                     [class.focus:ring-4]="isGameMode()"
                     [class.focus:ring-primary/20]="isGameMode()"
                     [value]="getAnswer(question.id)?.textContent || ''"
-                    placeholder="Type your answer..."
+                    [placeholder]="'TEST.TYPE_ANSWER_PLACEHOLDER' | translate"
                     (input)="onTextInput(question.id, $event)"
                   />
                 }
@@ -151,7 +152,7 @@ import { ThemeService } from '../../../core/services/theme.service';
                     [value]="getAnswer(question.id)?.selectedOptions || ''"
                     (change)="onDropdownChange(question.id, $event)"
                   >
-                    <option value="" disabled>Select an answer...</option>
+                    <option value="" disabled>{{ 'TEST.SELECT_ANSWER_PLACEHOLDER' | translate }}</option>
                     @for (option of parseOptions(question.options); track option.key) {
                       <option [value]="option.key">{{ option.key }}. {{ option.text }}</option>
                     }
@@ -167,7 +168,7 @@ import { ThemeService } from '../../../core/services/theme.service';
                     [class.focus:ring-4]="isGameMode()"
                     [class.focus:ring-primary/20]="isGameMode()"
                     [value]="getAnswer(question.id)?.textContent || ''"
-                    placeholder="Type your answer..."
+                    [placeholder]="'TEST.TYPE_ANSWER_PLACEHOLDER' | translate"
                     (input)="onTextInput(question.id, $event)"
                   />
                 }

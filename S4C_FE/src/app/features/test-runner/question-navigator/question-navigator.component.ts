@@ -1,5 +1,6 @@
 import { Component, input, output, inject, signal, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { TranslateModule } from '@ngx-translate/core';
 import { ThemeService } from '../../../core/services/theme.service';
 
 interface FlatQuestion {
@@ -9,10 +10,10 @@ interface FlatQuestion {
 
 @Component({
   selector: 'app-question-navigator',
-  imports: [CommonModule],
+  imports: [CommonModule, TranslateModule],
   template: `
     <div class="h-full flex flex-col">
-      <h3 class="text-base font-semibold text-text mb-4 pb-3 border-b border-border">Questions</h3>
+      <h3 class="text-base font-semibold text-text mb-4 pb-3 border-b border-border">{{ 'TEST.QUESTIONS' | translate }}</h3>
       <div class="grid grid-cols-5 gap-1 flex-1 overflow-y-auto pb-4 content-start">
         @for (q of questions(); track q.question.id; let i = $index) {
           <button
@@ -47,14 +48,14 @@ interface FlatQuestion {
             [class.rounded-full]="isGameMode()"
             [class.animate-pulse]="isGameMode()"
           ></span>
-          <span>Answered</span>
+          <span>{{ 'TEST.ANSWERED' | translate }}</span>
         </div>
         <div class="flex items-center gap-2 text-xs text-text-muted">
           <span 
             class="w-4 h-4 rounded border-2 border-border bg-surface"
             [class.rounded-full]="isGameMode()"
           ></span>
-          <span>Unanswered</span>
+          <span>{{ 'TEST.UNANSWERED' | translate }}</span>
         </div>
         <div class="flex items-center gap-2 text-xs text-text-muted">
           <span 
@@ -62,7 +63,7 @@ interface FlatQuestion {
             [class.rounded-full]="isGameMode()"
             [class.animate-pulse]="isGameMode()"
           ></span>
-          <span>Current</span>
+          <span>{{ 'TEST.CURRENT' | translate }}</span>
         </div>
       </div>
     </div>

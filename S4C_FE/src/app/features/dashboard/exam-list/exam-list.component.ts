@@ -2,6 +2,7 @@ import { Component, inject, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { TranslateModule } from '@ngx-translate/core';
 import { ExamService } from '../../../core/services/exam.service';
 import { TestAttemptService } from '../../../core/services/test-attempt.service';
 import { ThemeService } from '../../../core/services/theme.service';
@@ -11,7 +12,7 @@ import { ExamCardComponent } from '../exam-card/exam-card.component';
 
 @Component({
   selector: 'app-exam-list',
-  imports: [CommonModule, FormsModule, ExamCardComponent],
+  imports: [CommonModule, FormsModule, ExamCardComponent, TranslateModule],
   template: `
     <div class="pb-8" [class.game-mode]="isGameMode()">
       <div class="max-w-[1200px] mx-auto px-4">
@@ -19,13 +20,13 @@ import { ExamCardComponent } from '../exam-card/exam-card.component';
           <div class="header-content">
             <h1 class="text-3xl md:text-4xl font-bold text-text mb-2">
               @if (isGameMode()) {
-                🚀 Practice & Level Up!
+                {{ 'DASHBOARD.TITLE_GAME' | translate }}
               } @else {
-                Practice Tests
+               {{ 'DASHBOARD.TITLE' | translate }}
               }
             </h1>
             <p class="text-muted m-0">
-              Choose a test to practice and improve your IELTS score
+              {{ 'DASHBOARD.SUBTITLE' | translate }}
             </p>
           </div>
         </header>
@@ -38,7 +39,7 @@ import { ExamCardComponent } from '../exam-card/exam-card.component';
           [class.border-border]="isGameMode()"
         >
           <div class="flex flex-col gap-1">
-            <label class="text-xs font-semibold text-muted uppercase tracking-wider">Type</label>
+            <label class="text-xs font-semibold text-muted uppercase tracking-wider">{{ 'COMMON.TYPE' | translate }}</label>
             <select
               class="py-2.5 px-3.5 border border-border rounded-md text-sm bg-surface text-text transition-colors focus:outline-none focus:border-primary"
               [class.border-2]="isGameMode()"
@@ -46,7 +47,7 @@ import { ExamCardComponent } from '../exam-card/exam-card.component';
               [(ngModel)]="selectedType"
               (ngModelChange)="onFilterChange()"
             >
-              <option [ngValue]="null">All Types</option>
+              <option [ngValue]="null">{{ 'COMMON.ALL_TYPES' | translate }}</option>
               <option [value]="'IeltsAcademic'">IELTS Academic</option>
               <option [value]="'IeltsGeneral'">IELTS General</option>
               <option [value]="'Toeic'">TOEIC</option>
@@ -54,13 +55,13 @@ import { ExamCardComponent } from '../exam-card/exam-card.component';
           </div>
 
           <div class="flex flex-col gap-1 flex-1 min-w-[200px]">
-            <label class="text-xs font-semibold text-muted uppercase tracking-wider">Search</label>
+            <label class="text-xs font-semibold text-muted uppercase tracking-wider">{{ 'COMMON.SEARCH' | translate }}</label>
             <input
               type="text"
               class="py-2.5 px-3.5 border border-border rounded-md text-sm bg-surface text-text transition-colors focus:outline-none focus:border-primary"
               [class.border-2]="isGameMode()"
               [class.rounded-lg]="isGameMode()"
-              placeholder="Search exams..."
+              [placeholder]="'DASHBOARD.SEARCH_PLACEHOLDER' | translate"
               [(ngModel)]="searchQuery"
               (input)="onSearchChange()"
             />
@@ -71,7 +72,7 @@ import { ExamCardComponent } from '../exam-card/exam-card.component';
         @if (isLoading()) {
           <div class="text-center py-16 px-8 bg-surface rounded-lg">
             <div class="w-12 h-12 border-4 border-border border-t-primary rounded-full animate-spin mx-auto mb-4"></div>
-            <p>Loading exams...</p>
+            <p>{{ 'COMMON.LOADING_EXAMS' | translate }}</p>
           </div>
         }
 
@@ -79,7 +80,7 @@ import { ExamCardComponent } from '../exam-card/exam-card.component';
         @if (errorMessage()) {
           <div class="text-center py-16 px-8 bg-surface rounded-lg">
             <p class="text-error mb-4">{{ errorMessage() }}</p>
-            <button class="py-3 px-6 rounded-md border-none font-medium cursor-pointer transition-all bg-[image:var(--gradient-primary)] text-text-inverse" (click)="loadExams()">Try Again</button>
+            <button class="py-3 px-6 rounded-md border-none font-medium cursor-pointer transition-all bg-[image:var(--gradient-primary)] text-text-inverse" (click)="loadExams()">{{ 'COMMON.TRY_AGAIN' | translate }}</button>
           </div>
         }
 
@@ -105,10 +106,10 @@ import { ExamCardComponent } from '../exam-card/exam-card.component';
                   [disabled]="!pagination()!.hasPreviousPage"
                   (click)="onPageChange(currentPage() - 1)"
                 >
-                  ← Previous
+                  ← {{ 'COMMON.PREVIOUS' | translate }}
                 </button>
                 <span class="text-muted text-sm">
-                  Page {{ currentPage() }} of {{ pagination()!.totalPages }}
+                   {{ 'COMMON.PAGE_OF' | translate:{current: currentPage(), total: pagination()!.totalPages} }}
                 </span>
                 <button
                   class="py-2 px-4 border border-border rounded-md bg-surface text-text font-medium cursor-pointer transition-all hover:enabled:border-primary hover:enabled:text-primary disabled:opacity-50 disabled:cursor-not-allowed"
@@ -117,15 +118,15 @@ import { ExamCardComponent } from '../exam-card/exam-card.component';
                   [disabled]="!pagination()!.hasNextPage"
                   (click)="onPageChange(currentPage() + 1)"
                 >
-                  Next →
+                  {{ 'COMMON.NEXT' | translate }} →
                 </button>
               </div>
             }
           } @else {
             <div class="text-center py-16 px-8 bg-surface rounded-lg text-muted">
               <span class="text-6xl block mb-4">📚</span>
-              <h3 class="text-text m-0 mb-2">No exams found</h3>
-              <p>Try adjusting your filters or check back later for new tests.</p>
+              <h3 class="text-text m-0 mb-2">{{ 'DASHBOARD.NO_EXAMS' | translate }}</h3>
+              <p>{{ 'DASHBOARD.NO_EXAMS_SUB' | translate }}</p>
             </div>
           }
         }

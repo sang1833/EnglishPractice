@@ -1,6 +1,7 @@
 import { Component, inject, signal, OnInit, OnDestroy, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
+import { TranslateModule } from '@ngx-translate/core';
 import { ExamService } from '../../core/services/exam.service';
 import { TestAttemptService } from '../../core/services/test-attempt.service';
 import {
@@ -27,13 +28,13 @@ interface FlatQuestion {
 
 @Component({
   selector: 'app-test-runner',
-  imports: [CommonModule, QuestionGroupComponent, QuestionNavigatorComponent, TimerWarningComponent],
+  imports: [CommonModule, QuestionGroupComponent, QuestionNavigatorComponent, TimerWarningComponent, TranslateModule],
   template: `
     <div class="min-h-screen flex flex-col bg-background">
       @if (isLoading()) {
         <div class="fixed inset-0 bg-white/90 flex flex-col items-center justify-center z-[1000]">
           <div class="w-12 h-12 border-4 border-border border-t-primary rounded-full animate-spin mb-4"></div>
-          <p>Loading test...</p>
+          <p>{{ 'TEST.LOADING' | translate }}</p>
         </div>
       }
 
@@ -64,10 +65,10 @@ interface FlatQuestion {
           </div>
           <div class="flex gap-4">
             <button class="py-2 px-4 border-none rounded-md font-medium cursor-pointer transition-all bg-surface-alt text-text hover:bg-border" (click)="pauseTest()" [disabled]="isSubmitting()">
-              ⏸️ Pause
+              ⏸️ {{ 'TEST.PAUSE' | translate }}
             </button>
             <button class="py-2 px-4 border-none rounded-md font-medium cursor-pointer transition-all bg-error text-text-inverse hover:opacity-90" (click)="confirmSubmit()" [disabled]="isSubmitting()">
-              Submit Test
+              {{ 'TEST.SUBMIT' | translate }}
             </button>
           </div>
         </header>
@@ -108,7 +109,7 @@ interface FlatQuestion {
                       </div>
                    }
                    <button class="w-full py-2 bg-surface-alt text-text rounded-md text-sm mb-2" (click)="toggleMobilePassage()">
-                      {{ showMobilePassage() ? 'Hide Passage' : 'Show Passage' }}
+                      {{ (showMobilePassage() ? 'TEST.HIDE_PASSAGE' : 'TEST.SHOW_PASSAGE') | translate }}
                    </button>
                    @if (showMobilePassage() && currentSection()!.textContent) {
                       <div class="p-4 bg-surface-alt rounded-md text-sm leading-relaxed mb-4 max-h-[300px] overflow-y-auto" [innerHTML]="currentSection()!.textContent"></div>
@@ -143,17 +144,17 @@ interface FlatQuestion {
             [disabled]="currentSectionIndex() === 0"
             (click)="previousSection()"
           >
-            ← Previous
+            ← {{ 'COMMON.PREVIOUS' | translate }}
           </button>
           <span class="text-muted text-sm font-medium">
-            Section {{ currentSectionIndex() + 1 }} / {{ totalSections() }}
+            {{ 'TEST.SECTION_COUNTER' | translate:{current: currentSectionIndex() + 1, total: totalSections()} }}
           </span>
           <button
             class="py-2 px-4 border border-border rounded-md bg-surface text-text font-medium cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
             [disabled]="currentSectionIndex() >= totalSections() - 1"
             (click)="nextSection()"
           >
-            Next →
+            {{ 'COMMON.NEXT' | translate }} →
           </button>
         </nav>
 
@@ -161,18 +162,18 @@ interface FlatQuestion {
         @if (showSubmitModal()) {
           <div class="fixed inset-0 bg-black/50 flex items-center justify-center z-[1000] p-4" (click)="cancelSubmit()">
             <div class="bg-surface rounded-xl p-8 max-w-[400px] w-full text-center" (click)="$event.stopPropagation()">
-              <h2 class="text-xl font-bold text-text mb-4">Submit Test?</h2>
+              <h2 class="text-xl font-bold text-text mb-4">{{ 'TEST.SUBMIT_TITLE' | translate }}</h2>
               <p class="text-muted mb-2">
-                You have answered {{ answeredCount() }} of {{ totalQuestions() }} questions.
+                {{ 'TEST.ANSWERED_MSG' | translate:{answered: answeredCount(), total: totalQuestions()} }}
               </p>
               @if (answeredCount() < totalQuestions()) {
                 <p class="text-error font-medium mb-4">
-                  ⚠️ {{ totalQuestions() - answeredCount() }} questions are unanswered.
+                  {{ 'TEST.UNANSWERED_WARNING' | translate:{count: totalQuestions() - answeredCount()} }}
                 </p>
               }
               <div class="flex gap-4 mt-6">
                 <button class="flex-1 py-3 px-4 border-none rounded-lg font-medium cursor-pointer transition-all bg-surface-alt text-text hover:bg-border" (click)="cancelSubmit()">
-                  Continue Test
+                  {{ 'TEST.CONTINUE' | translate }}
                 </button>
                 <button
                   class="flex-1 py-3 px-4 border-none rounded-lg font-medium cursor-pointer transition-all bg-[image:var(--gradient-primary)] text-text-inverse hover:shadow-lg disabled:opacity-70 disabled:cursor-not-allowed"
@@ -180,9 +181,9 @@ interface FlatQuestion {
                   (click)="submitTest()"
                 >
                   @if (isSubmitting()) {
-                    <span class="inline-block w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2"></span> Submitting...
+                    <span class="inline-block w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2"></span> {{ 'TEST.SUBMITTING' | translate }}
                   } @else {
-                    Submit Test
+                    {{ 'TEST.SUBMIT' | translate }}
                   }
                 </button>
               </div>

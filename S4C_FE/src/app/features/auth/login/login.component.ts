@@ -2,15 +2,16 @@ import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
+import { TranslateModule } from '@ngx-translate/core';
 import { AuthService } from '../../../core/services/auth.service';
 
 @Component({
   selector: 'app-login',
-  imports: [CommonModule, ReactiveFormsModule, RouterLink],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink, TranslateModule],
   template: `
     <div class="text-center">
-      <h2 class="text-3xl font-semibold text-text mb-2">Welcome Back</h2>
-      <p class="text-muted mb-6">Sign in to continue to your account</p>
+      <h2 class="text-3xl font-semibold text-text mb-2">{{ 'AUTH.LOGIN_TITLE' | translate }}</h2>
+      <p class="text-muted mb-6">{{ 'AUTH.LOGIN_SUBTITLE' | translate }}</p>
 
       @if (errorMessage()) {
         <div class="bg-error/10 text-error p-3 rounded-md mb-4 flex items-center gap-2 text-sm border border-error">
@@ -21,7 +22,7 @@ import { AuthService } from '../../../core/services/auth.service';
 
       <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="text-left">
         <div class="mb-5">
-          <label for="email" class="block font-medium text-text mb-2 text-sm">Email</label>
+          <label for="email" class="block font-medium text-text mb-2 text-sm">{{ 'AUTH.EMAIL_LABEL' | translate }}</label>
           <input
             type="email"
             id="email"
@@ -36,7 +37,7 @@ import { AuthService } from '../../../core/services/auth.service';
         </div>
 
         <div class="mb-5">
-          <label for="password" class="block font-medium text-text mb-2 text-sm">Password</label>
+          <label for="password" class="block font-medium text-text mb-2 text-sm">{{ 'AUTH.PASSWORD_LABEL' | translate }}</label>
           <input
             type="password"
             id="password"
@@ -57,16 +58,16 @@ import { AuthService } from '../../../core/services/auth.service';
         >
           @if (authService.isLoading()) {
             <span class="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
-            Signing in...
+             {{ 'COMMON.LOADING' | translate }}
           } @else {
-            Sign In
+             {{ 'AUTH.SIGN_IN_BUTTON' | translate }}
           }
         </button>
       </form>
 
       <p class="mt-6 text-muted text-sm">
-        Don't have an account?
-        <a routerLink="/auth/register" class="text-primary no-underline font-medium hover:underline">Create one</a>
+        {{ 'AUTH.NO_ACCOUNT' | translate }}
+        <a routerLink="/auth/register" class="text-primary no-underline font-medium hover:underline">{{ 'AUTH.SIGN_UP_LINK' | translate }}</a>
       </p>
     </div>
   `

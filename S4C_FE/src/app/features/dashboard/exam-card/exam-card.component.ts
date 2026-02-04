@@ -1,12 +1,13 @@
 import { Component, input, output, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
+import { TranslateModule } from '@ngx-translate/core';
 import { ExamListDto, ExamType } from '../../../core/models';
 import { ThemeService } from '../../../core/services/theme.service';
 
 @Component({
   selector: 'app-exam-card',
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, TranslateModule],
   template: `
     <article 
       class="block bg-surface rounded-xl overflow-hidden shadow-[var(--shadow-card)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[var(--shadow-lg-theme)]"
@@ -33,7 +34,7 @@ import { ThemeService } from '../../../core/services/theme.service';
             'bg-gray-400/90': exam().type !== 'IeltsAcademic' && exam().type !== 'IeltsGeneral'
           }"
         >
-          {{ formatType(exam().type) }}
+          {{ getExamTypeKey(exam().type) | translate }}
         </span>
       </div>
 
@@ -43,7 +44,7 @@ import { ThemeService } from '../../../core/services/theme.service';
         <div class="flex gap-4 mb-4 text-muted text-sm">
           <span class="flex items-center gap-1">
             <span>⏱️</span>
-            {{ exam().duration }} mins
+            {{ exam().duration }} {{ 'COMMON.MINS' | translate }}
           </span>
         </div>
 
@@ -54,7 +55,7 @@ import { ThemeService } from '../../../core/services/theme.service';
             [class.hover:scale-105]="isGameMode()"
             [class.active:scale-95]="isGameMode()"
           >
-            View Details
+            {{ 'DASHBOARD.VIEW_DETAILS' | translate }}
           </a>
           <button
             class="flex-1 py-2.5 px-4 rounded-md text-sm font-medium text-center cursor-pointer transition-all border-none bg-surface-alt text-text hover:bg-border"
@@ -62,7 +63,7 @@ import { ThemeService } from '../../../core/services/theme.service';
             [class.active:scale-95]="isGameMode()"
             (click)="onStartTest()"
           >
-            Start Test
+            {{ 'DASHBOARD.START_NOW' | translate }}
           </button>
         </div>
       </div>
@@ -89,16 +90,16 @@ export class ExamCardComponent {
     this.isHovered.set(false);
   }
 
-  protected formatType(type: ExamType): string {
+  protected getExamTypeKey(type: ExamType): string {
     switch (type) {
       case ExamType.IeltsAcademic:
-        return 'Academic';
+        return 'COMMON.EXAM_TYPE.ACADEMIC';
       case ExamType.IeltsGeneral:
-        return 'General';
+        return 'COMMON.EXAM_TYPE.GENERAL';
       case ExamType.Toeic:
-        return 'TOEIC';
+        return 'COMMON.EXAM_TYPE.TOEIC';
       default:
-        return 'Other';
+        return 'COMMON.EXAM_TYPE.OTHER';
     }
   }
 
