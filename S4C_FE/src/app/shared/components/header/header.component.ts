@@ -29,17 +29,17 @@ import { ThemeSwitcherComponent } from '../theme-switcher/theme-switcher.compone
               class="flex items-center gap-2 bg-transparent border border-border cursor-pointer p-2 rounded-md transition-colors hover:bg-surface-alt text-text" 
               (click)="toggleLangMenu()"
             >
-              <span class="text-sm">{{ languageService.currentLang() === 'vi' ? 'VN' : 'GB' }}</span>
-              <span class="text-sm font-medium uppercase">{{ languageService.currentLang() === 'vi' ? 'Tiếng Việt' : 'English' }}</span>
+              <span class="text-sm">{{ languageService.currentLang().toUpperCase() || "vi" }}</span>
+              <span class="text-sm font-medium">{{ languageService.currentLang() === 'vi' ? 'Tiếng Việt' : 'English' }}</span>
             </button>
 
             @if (langMenuOpen) {
               <div class="absolute top-full right-0 bg-surface border border-border rounded-lg shadow-lg min-w-[120px] py-2 mt-2 z-[999]">
                  <button class="flex items-center gap-3 w-full px-4 py-2 text-left bg-transparent border-none text-text hover:bg-surface-alt transition-colors cursor-pointer" (click)="setLang('en')">
-                    <span class="text-lg">English</span> 
+                    <span class="text-lg">Tiếng Việt</span> 
                  </button>
                  <button class="flex items-center gap-3 w-full px-4 py-2 text-left bg-transparent border-none text-text hover:bg-surface-alt transition-colors cursor-pointer" (click)="setLang('vi')">
-                    <span class="text-lg">Tiếng Việt</span> 
+                    <span class="text-lg">English</span> 
                  </button>
               </div>
             }

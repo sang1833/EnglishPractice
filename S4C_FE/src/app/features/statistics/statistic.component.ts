@@ -6,6 +6,7 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { StatisticService } from '../../core/services/statistic.service';
 import { ThemeService } from '../../core/services/theme.service';
 import { StatisticResponse, StatisticPeriod } from '../../core/models/statistic.models';
+import { Subscription } from 'rxjs/internal/Subscription';
 
 
 Chart.register(...registerables);
@@ -145,6 +146,7 @@ export class StatisticComponent implements OnInit, AfterViewInit {
   private readonly statisticService = inject(StatisticService);
   private readonly themeService = inject(ThemeService);
   private readonly translateService = inject(TranslateService);
+  private langChangeSubscription?: Subscription;
 
   protected data = signal<StatisticResponse | null>(null);
   protected isLoading = signal(false);
@@ -160,11 +162,15 @@ export class StatisticComponent implements OnInit, AfterViewInit {
     this.loadData();
 
     // Listen to language changes to update charts
-    this.translateService.onLangChange.subscribe(() => {
+    this.langChangeSubscription = this.translateService.onLangChange.subscribe(() => {
       if (this.data()) {
         this.renderCharts();
       }
     });
+  }
+
+  ngOnDestroy(): void {
+    this.langChangeSubscription?.unsubscribe();
   }
 
   ngAfterViewInit(): void {
