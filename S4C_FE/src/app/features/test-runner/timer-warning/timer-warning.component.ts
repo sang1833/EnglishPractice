@@ -1,11 +1,12 @@
 import { Component, input, output, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { TranslateModule } from '@ngx-translate/core';
 import { ThemeService } from '../../../core/services/theme.service';
 
 
 @Component({
   selector: 'app-timer-warning',
-  imports: [CommonModule],
+  imports: [CommonModule, TranslateModule],
   template: `
     @if (visible()) {
       <div 
@@ -22,8 +23,8 @@ import { ThemeService } from '../../../core/services/theme.service';
         >
           <span class="text-2xl" [class.animate-bounce]="isGameMode()">⚠️</span>
           <div class="flex-1 flex flex-col gap-1">
-            <strong class="text-sm">Time is running out!</strong>
-            <span class="text-xs opacity-90">Only {{ formatTime(timeRemaining()) }} remaining</span>
+            <strong class="text-sm">{{ 'TEST.TIME_RUNNING_OUT' | translate }}</strong>
+            <span class="text-xs opacity-90">{{ 'TEST.TIME_REMAINING_MSG' | translate:{time: formatTime(timeRemaining())} }}</span>
           </div>
           <button 
             class="flex items-center justify-center w-7 h-7 rounded-full bg-white/20 border-none text-text-inverse text-xl cursor-pointer transition-colors hover:bg-white/30"

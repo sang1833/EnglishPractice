@@ -2,6 +2,7 @@ import { Component, inject, signal, OnInit, ViewChild, ElementRef, AfterViewInit
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { Chart, ChartConfiguration, registerables } from 'chart.js';
+import { TranslateModule } from '@ngx-translate/core';
 import { TestAttemptService } from '../../core/services/test-attempt.service';
 import { ThemeService } from '../../core/services/theme.service';
 import { TestResultDto, SkillResultDto, SkillType } from '../../core/models';
@@ -11,14 +12,14 @@ Chart.register(...registerables);
 
 @Component({
   selector: 'app-test-result',
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, TranslateModule],
   template: `
     <div class="py-8 px-4 pb-16 min-h-screen bg-background">
       <div class="max-w-[900px] mx-auto relative">
         @if (isLoading()) {
           <div class="text-center py-16 px-8">
             <div class="w-12 h-12 border-4 border-border border-t-primary rounded-full animate-spin mx-auto mb-4"></div>
-            <p>Loading your results...</p>
+            <p>{{ 'RESULT.LOADING' | translate }}</p>
           </div>
         }
 
@@ -55,24 +56,24 @@ Chart.register(...registerables);
                 [class.animate-pulse-text]="isGameMode()"
               >
                 @if (isGameMode()) {
-                  🎉🏆 Amazing Job! 🏆🎉
+                  {{ 'RESULT.TITLE_GAME' | translate }}
                 } @else {
-                  🎉 Test Completed!
+                  {{ 'RESULT.TITLE_NORMAL' | translate }}
                 }
               </h1>
               <div class="flex flex-col items-center gap-2">
-                <span class="text-sm uppercase tracking-widest opacity-90">Overall Band Score</span>
+                <span class="text-sm uppercase tracking-widest opacity-90">{{ 'RESULT.OVERALL_SCORE' | translate }}</span>
                 <span 
                   class="text-[5rem] font-bold leading-none"
                   [class.animate-score-pop]="isGameMode()"
                 >{{ result()!.overallBandScore.toFixed(1) }}</span>
               </div>
               <p class="mt-6 opacity-90">
-                {{ getScoreDescription(result()!.overallBandScore) }}
+                {{ getScoreDescription(result()!.overallBandScore) | translate }}
               </p>
               @if (isGameMode()) {
                 <div class="mt-6">
-                  <span class="inline-block bg-white/20 py-2 px-4 rounded-full font-bold text-lg animate-xp-glow">+{{ getXpEarned() }} XP</span>
+                  <span class="inline-block bg-white/20 py-2 px-4 rounded-full font-bold text-lg animate-xp-glow">{{ 'RESULT.XP_EARNED' | translate:{xp: getXpEarned()} }}</span>
                 </div>
               }
             </div>
@@ -80,7 +81,7 @@ Chart.register(...registerables);
 
           <!-- Skills Breakdown -->
           <section class="mb-8">
-            <h2 class="text-xl font-semibold text-text mb-4">Skills Breakdown</h2>
+            <h2 class="text-xl font-semibold text-text mb-4">{{ 'RESULT.SKILLS_BREAKDOWN' | translate }}</h2>
             <div class="grid grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-4">
               @for (skill of result()!.skillResults; track skill.skill; let i = $index) {
                 <div 
@@ -88,11 +89,11 @@ Chart.register(...registerables);
                 >
                   <div class="text-3xl mb-3" [class.animate-icon-bounce]="isGameMode()">{{ getSkillIcon(skill.skill) }}</div>
                   <div class="flex justify-between items-center mb-3">
-                    <span class="font-semibold text-text">{{ formatSkill(skill.skill) }}</span>
+                    <span class="font-semibold text-text">{{ formatSkill(skill.skill) | translate }}</span>
                     <span class="text-2xl font-bold text-primary">{{ skill.bandScore.toFixed(1) }}</span>
                   </div>
                   <div class="text-sm text-text-muted">
-                    <span>{{ skill.correctCount }} / {{ skill.totalQuestions }} correct</span>
+                    <span>{{ 'RESULT.CORRECT_COUNT' | translate:{correct: skill.correctCount, total: skill.totalQuestions} }}</span>
                     <div class="h-2 bg-border rounded-full mt-2 overflow-hidden">
                       <div
                         class="h-full bg-[image:var(--gradient-primary)] rounded-full transition-[width] duration-500 ease"
@@ -110,7 +111,7 @@ Chart.register(...registerables);
 
           <!-- Chart Section -->
           <section class="mb-8">
-            <h2 class="text-xl font-semibold text-text mb-4">Performance Chart</h2>
+            <h2 class="text-xl font-semibold text-text mb-4">{{ 'RESULT.CHART_TITLE' | translate }}</h2>
             <div class="bg-surface rounded-xl p-6 shadow-[var(--shadow-sm)]">
               <canvas #chartCanvas></canvas>
             </div>
@@ -124,8 +125,8 @@ Chart.register(...registerables);
               [class.active:scale-98]="isGameMode()"
               (click)="toggleReview()"
             >
-              {{ showReview() ? '▲ Hide' : '▼ Show' }} Detailed Review
-              ({{ result()!.questionResults.length }} questions)
+              {{ (showReview() ? 'RESULT.HIDE_REVIEW' : 'RESULT.SHOW_REVIEW') | translate }}
+              {{ 'RESULT.REVIEW_COUNT' | translate:{count: result()!.questionResults.length} }}
             </button>
 
             <!-- Review Section with CSS Grid Transition -->
@@ -145,11 +146,11 @@ Chart.register(...registerables);
                         <p class="m-0 mb-2 text-text" [innerHTML]="qr.questionContent || 'Question ' + (i + 1)"></p>
                         <div class="flex flex-col gap-1 text-sm">
                           <span class="text-text">
-                            Your answer: <strong>{{ qr.userAnswer || '(no answer)' }}</strong>
+                            {{ 'RESULT.YOUR_ANSWER' | translate }} <strong>{{ qr.userAnswer || (('RESULT.NO_ANSWER' | translate)) }}</strong>
                           </span>
                           @if (!qr.isCorrect) {
                             <span class="text-success">
-                              Correct: <strong>{{ qr.correctAnswer }}</strong>
+                              {{ 'RESULT.CORRECT_ANSWER' | translate }} <strong>{{ qr.correctAnswer }}</strong>
                             </span>
                           }
                         </div>
@@ -178,9 +179,9 @@ Chart.register(...registerables);
               [class.active:scale-95]="isGameMode()"
             >
               @if (isGameMode()) {
-                🚀 Try Another Test
+                {{ 'RESULT.TRY_ANOTHER_GAME' | translate }}
               } @else {
-                Try Another Test
+                {{ 'RESULT.TRY_ANOTHER' | translate }}
               }
             </a>
             <a 
@@ -190,9 +191,9 @@ Chart.register(...registerables);
               [class.active:scale-95]="isGameMode()"
             >
               @if (isGameMode()) {
-                📊 View History
+                {{ 'RESULT.VIEW_HISTORY_GAME' | translate }}
               } @else {
-                View Test History
+                {{ 'RESULT.VIEW_HISTORY' | translate }}
               }
             </a>
           </section>
@@ -276,6 +277,8 @@ export class TestResultComponent implements OnInit, AfterViewInit {
     if (!ctx) return;
 
     const skillResults = this.result()!.skillResults;
+    // TODO: Ideally translate these labels too, but Chart.js makes it tricky. 
+    // We could inject TranslateService but it's okay for now or we can use the keys.
     const labels = skillResults.map((s) => this.formatSkill(s.skill));
     const scores = skillResults.map((s) => s.bandScore);
 
@@ -328,12 +331,13 @@ export class TestResultComponent implements OnInit, AfterViewInit {
   }
 
   protected formatSkill(skill: SkillType): string {
+    // Return translation keys
     switch (skill) {
-      case SkillType.Listening: return 'Listening';
-      case SkillType.Reading: return 'Reading';
-      case SkillType.Writing: return 'Writing';
-      case SkillType.Speaking: return 'Speaking';
-      default: return 'Other';
+      case SkillType.Listening: return 'COMMON.SKILLS.LISTENING';
+      case SkillType.Reading: return 'COMMON.SKILLS.READING';
+      case SkillType.Writing: return 'COMMON.SKILLS.WRITING';
+      case SkillType.Speaking: return 'COMMON.SKILLS.SPEAKING';
+      default: return 'COMMON.EXAM_TYPE.OTHER';
     }
   }
 
@@ -349,18 +353,18 @@ export class TestResultComponent implements OnInit, AfterViewInit {
 
   protected getScoreDescription(score: number): string {
     if (this.isGameMode()) {
-      if (score >= 8) return '🌟 Legendary! You\'re a language master!';
-      if (score >= 7) return '🔥 Impressive! Keep up the momentum!';
-      if (score >= 6) return '💪 Great job! You\'re making progress!';
-      if (score >= 5) return '👍 Nice work! Practice makes perfect!';
-      if (score >= 4) return '🎯 Good start! Keep practicing!';
-      return '🚀 Every journey starts with a step!';
+      if (score >= 8) return 'RESULT.FEEDBACK.GAME_8';
+      if (score >= 7) return 'RESULT.FEEDBACK.GAME_7';
+      if (score >= 6) return 'RESULT.FEEDBACK.GAME_6';
+      if (score >= 5) return 'RESULT.FEEDBACK.GAME_5';
+      if (score >= 4) return 'RESULT.FEEDBACK.GAME_4';
+      return 'RESULT.FEEDBACK.GAME_LOW';
     }
-    if (score >= 8) return 'Excellent! You are an expert user.';
-    if (score >= 7) return 'Very good! You have operational command.';
-    if (score >= 6) return 'Good! You are a competent user.';
-    if (score >= 5) return 'Modest. You have partial command of the language.';
-    if (score >= 4) return 'Limited. Basic competence is developing.';
-    return 'Keep practicing to improve your score!';
+    if (score >= 8) return 'RESULT.FEEDBACK.NORMAL_8';
+    if (score >= 7) return 'RESULT.FEEDBACK.NORMAL_7';
+    if (score >= 6) return 'RESULT.FEEDBACK.NORMAL_6';
+    if (score >= 5) return 'RESULT.FEEDBACK.NORMAL_5';
+    if (score >= 4) return 'RESULT.FEEDBACK.NORMAL_4';
+    return 'RESULT.FEEDBACK.NORMAL_LOW';
   }
 }
