@@ -12,8 +12,9 @@ import { ThemeSwitcherComponent } from '../theme-switcher/theme-switcher.compone
   template: `
     <header class="bg-surface shadow-[var(--shadow-sm)] sticky top-0 z-[888]">
       <div class="max-w-[1200px] mx-auto px-4 flex items-center justify-between h-16">
-        <a routerLink="/dashboard" class="no-underline">
-          <span class="text-2xl font-bold bg-[image:var(--gradient-primary)] bg-clip-text text-transparent">Exam Practice</span>
+        <a routerLink="/dashboard" class="no-underline flex items-center gap-2">
+          <img src="/icon.png" alt="Logo" class="h-10" />
+          <span class="text-xl font-bold bg-[image:var(--gradient-primary)] bg-clip-text text-transparent">Exam Practice</span>
         </a>
 
         <nav class="hidden md:flex gap-8">
@@ -108,6 +109,7 @@ export class HeaderComponent {
   protected menuOpen = false;
   protected mobileMenuOpen = false;
   protected langMenuOpen = false;
+  protected logoUrl = '/icon.png';
 
   toggleMenu(): void {
     this.menuOpen = !this.menuOpen;
