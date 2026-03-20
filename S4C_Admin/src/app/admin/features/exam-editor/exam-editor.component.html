@@ -1,0 +1,542 @@
+@if (isLoading()) {
+  <div class="flex items-center justify-center h-[70vh]">
+    <div class="text-center">
+      <div class="mx-auto h-12 w-12 animate-spin rounded-full border-4 border-gray-200 border-t-blue-600"></div>
+      <p class="mt-4 text-sm text-gray-600">Loading editor...</p>
+    </div>
+  </div>
+} @else {
+  <form [formGroup]="examForm" (ngSubmit)="onSubmit()" class="p-6 max-w-7xl mx-auto space-y-6">
+    <div class="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+      <div>
+        <p class="text-sm font-medium uppercase tracking-wide text-blue-600">
+          {{ isEditMode() ? 'Edit Exam' : 'Create Exam' }}
+        </p>
+        <h1 class="mt-1 text-3xl font-bold text-gray-900">
+          {{ examForm.get('title')?.value || (isEditMode() ? 'Untitled exam' : 'New exam') }}
+        </h1>
+        <p class="mt-2 text-sm text-gray-600">
+          Manage the full exam tree in one place: metadata, skills, sections, question groups, and questions.
+        </p>
+      </div>
+
+      <div class="flex flex-wrap items-center gap-3">
+        <button
+          type="button"
+          (click)="goBack()"
+          class="rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50"
+        >
+          Back to list
+        </button>
+        <button
+          type="submit"
+          [disabled]="isSaving()"
+          class="inline-flex items-center rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-medium text-white shadow-sm hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
+        >
+          @if (isSaving()) {
+            <span class="mr-2 inline-block h-4 w-4 animate-spin rounded-full border-2 border-white/40 border-t-white"></span>
+            Saving...
+          } @else {
+            {{ isEditMode() ? 'Save Exam' : 'Create Exam' }}
+          }
+        </button>
+      </div>
+    </div>
+
+    @if (error()) {
+      <div class="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+        {{ error() }}
+      </div>
+    }
+
+    @if (success()) {
+      <div class="rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700">
+        {{ success() }}
+      </div>
+    }
+
+    <section class="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+      <div class="mb-5 flex items-center justify-between">
+        <div>
+          <h2 class="text-lg font-semibold text-gray-900">Exam Metadata</h2>
+          <p class="text-sm text-gray-500">Basic information used for listing, routing, and publishing.</p>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 gap-5 xl:grid-cols-2">
+        <div class="xl:col-span-2">
+          <label class="mb-2 block text-sm font-medium text-gray-700">Title</label>
+          <input
+            type="text"
+            formControlName="title"
+            class="w-full rounded-xl border border-gray-300 px-4 py-3 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
+            placeholder="Cambridge IELTS 18 Test 1"
+          />
+          @if (examForm.get('title')?.invalid && examForm.get('title')?.touched) {
+            <p class="mt-2 text-sm text-red-600">Title is required.</p>
+          }
+        </div>
+
+        <div>
+          <label class="mb-2 block text-sm font-medium text-gray-700">Slug</label>
+          <input
+            type="text"
+            formControlName="slug"
+            class="w-full rounded-xl border border-gray-300 px-4 py-3 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
+            placeholder="cambridge-ielts-18-test-1"
+          />
+          <p class="mt-2 text-xs text-gray-500">Leave blank to auto-generate from the title.</p>
+        </div>
+
+        <div>
+          <label class="mb-2 block text-sm font-medium text-gray-700">Thumbnail URL</label>
+          <input
+            type="text"
+            formControlName="thumbnailUrl"
+            class="w-full rounded-xl border border-gray-300 px-4 py-3 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
+            placeholder="https://..."
+          />
+        </div>
+
+        <div>
+          <label class="mb-2 block text-sm font-medium text-gray-700">Exam Type</label>
+          <select
+            formControlName="type"
+            class="w-full rounded-xl border border-gray-300 px-4 py-3 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
+          >
+            <option *ngFor="let examType of examTypes" [value]="examType">{{ examType }}</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="mb-2 block text-sm font-medium text-gray-700">Status</label>
+          <select
+            formControlName="status"
+            class="w-full rounded-xl border border-gray-300 px-4 py-3 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
+          >
+            <option *ngFor="let status of examStatuses" [value]="status">{{ status }}</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="mb-2 block text-sm font-medium text-gray-700">Duration (minutes)</label>
+          <input
+            type="number"
+            formControlName="duration"
+            class="w-full rounded-xl border border-gray-300 px-4 py-3 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
+          />
+        </div>
+
+        <div class="xl:col-span-2">
+          <label class="mb-2 block text-sm font-medium text-gray-700">Description</label>
+          <textarea
+            formControlName="description"
+            rows="4"
+            class="w-full rounded-xl border border-gray-300 px-4 py-3 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
+            placeholder="Exam overview, source, notes..."
+          ></textarea>
+        </div>
+      </div>
+    </section>
+
+    <section class="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+      <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+        <div>
+          <h2 class="text-lg font-semibold text-gray-900">Skills</h2>
+          <p class="text-sm text-gray-500">Add the skills included in this exam and edit them in-place.</p>
+        </div>
+
+        <div class="flex flex-wrap gap-2">
+          <button
+            type="button"
+            (click)="applyIeltsPreset()"
+            class="rounded-lg border border-blue-200 bg-blue-50 px-4 py-2 text-sm font-medium text-blue-700 hover:bg-blue-100"
+          >
+            Add IELTS preset
+          </button>
+          <button
+            type="button"
+            (click)="addSkill()"
+            class="rounded-lg bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-gray-800"
+          >
+            Add skill
+          </button>
+        </div>
+      </div>
+
+      <div formArrayName="skills" class="mt-6 space-y-5">
+        <ng-container *ngIf="skills.controls.length; else emptySkills">
+          <div
+            *ngFor="let skillControl of skills.controls; let skillIndex = index; trackBy: trackByIndex"
+            [formGroupName]="skillIndex"
+            class="rounded-2xl border border-gray-200 bg-gray-50/70"
+          >
+            <details open class="group">
+              <summary class="flex cursor-pointer list-none items-center justify-between gap-4 px-5 py-4">
+                <div>
+                  <p class="text-base font-semibold text-gray-900">
+                    {{ skillControl.get('title')?.value || ('Skill ' + (skillIndex + 1)) }}
+                  </p>
+                  <p class="text-sm text-gray-500">
+                    {{ sections(skillIndex).length }} section(s)
+                  </p>
+                </div>
+                <div class="flex items-center gap-2">
+                  <span class="rounded-full bg-white px-3 py-1 text-xs font-medium text-gray-600 shadow-sm">
+                    {{ skillControl.get('skill')?.value || 'Skill' }}
+                  </span>
+                  <button
+                    type="button"
+                    (click)="removeSkill(skillIndex); $event.stopPropagation()"
+                    class="rounded-lg border border-red-200 bg-white px-3 py-2 text-sm font-medium text-red-600 hover:bg-red-50"
+                  >
+                    Remove
+                  </button>
+                </div>
+              </summary>
+
+              <div class="border-t border-gray-200 bg-white px-5 py-5">
+                <div class="grid grid-cols-1 gap-4 lg:grid-cols-4">
+                  <div>
+                    <label class="mb-2 block text-sm font-medium text-gray-700">Skill Type</label>
+                    <select
+                      formControlName="skill"
+                      class="w-full rounded-xl border border-gray-300 px-4 py-3 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
+                    >
+                      <option *ngFor="let skillType of skillTypes" [value]="skillType">{{ skillType }}</option>
+                    </select>
+                  </div>
+
+                  <div class="lg:col-span-2">
+                    <label class="mb-2 block text-sm font-medium text-gray-700">Skill Title</label>
+                    <input
+                      type="text"
+                      formControlName="title"
+                      class="w-full rounded-xl border border-gray-300 px-4 py-3 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
+                    />
+                  </div>
+
+                  <div>
+                    <label class="mb-2 block text-sm font-medium text-gray-700">Duration</label>
+                    <input
+                      type="number"
+                      formControlName="duration"
+                      class="w-full rounded-xl border border-gray-300 px-4 py-3 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
+                    />
+                  </div>
+                </div>
+
+                <div class="mt-5 flex items-center justify-between">
+                  <div>
+                    <h3 class="text-sm font-semibold uppercase tracking-wide text-gray-700">Sections</h3>
+                    <p class="text-sm text-gray-500">Reading passages, listening parts, writing tasks, or speaking prompts.</p>
+                  </div>
+                  <button
+                    type="button"
+                    (click)="addSection(skillIndex)"
+                    class="rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+                  >
+                    Add section
+                  </button>
+                </div>
+
+                <div formArrayName="sections" class="mt-4 space-y-4">
+                  <ng-container *ngIf="sections(skillIndex).controls.length; else emptySections">
+                    <div
+                      *ngFor="let sectionControl of sections(skillIndex).controls; let sectionIndex = index; trackBy: trackByIndex"
+                      [formGroupName]="sectionIndex"
+                      class="rounded-2xl border border-gray-200 bg-gray-50"
+                    >
+                      <details open>
+                        <summary class="flex cursor-pointer list-none items-center justify-between gap-4 px-4 py-4">
+                          <div>
+                            <p class="text-sm font-semibold text-gray-900">
+                              {{ sectionControl.get('title')?.value || ('Section ' + (sectionIndex + 1)) }}
+                            </p>
+                            <p class="text-xs text-gray-500">
+                              {{ groups(skillIndex, sectionIndex).length }} group(s)
+                            </p>
+                          </div>
+                          <button
+                            type="button"
+                            (click)="removeSection(skillIndex, sectionIndex); $event.stopPropagation()"
+                            class="rounded-lg border border-red-200 bg-white px-3 py-2 text-sm font-medium text-red-600 hover:bg-red-50"
+                          >
+                            Remove
+                          </button>
+                        </summary>
+
+                        <div class="border-t border-gray-200 bg-white px-4 py-4 space-y-4">
+                          <div class="grid grid-cols-1 gap-4 xl:grid-cols-2">
+                            <div>
+                              <label class="mb-2 block text-sm font-medium text-gray-700">Section Title</label>
+                              <input
+                                type="text"
+                                formControlName="title"
+                                class="w-full rounded-xl border border-gray-300 px-4 py-3 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
+                              />
+                            </div>
+
+                            <div>
+                              <label class="mb-2 block text-sm font-medium text-gray-700">Audio URL</label>
+                              <input
+                                type="text"
+                                formControlName="audioUrl"
+                                class="w-full rounded-xl border border-gray-300 px-4 py-3 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
+                              />
+                            </div>
+
+                            <div>
+                              <label class="mb-2 block text-sm font-medium text-gray-700">Image URL</label>
+                              <input
+                                type="text"
+                                formControlName="imageUrl"
+                                class="w-full rounded-xl border border-gray-300 px-4 py-3 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
+                              />
+                            </div>
+
+                            <div>
+                              <label class="mb-2 block text-sm font-medium text-gray-700">Transcript</label>
+                              <textarea
+                                formControlName="transcript"
+                                rows="3"
+                                class="w-full rounded-xl border border-gray-300 px-4 py-3 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
+                              ></textarea>
+                            </div>
+                          </div>
+
+                          <div>
+                            <label class="mb-2 block text-sm font-medium text-gray-700">Section Content</label>
+                            <textarea
+                              formControlName="textContent"
+                              rows="5"
+                              class="w-full rounded-xl border border-gray-300 px-4 py-3 font-mono text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
+                              placeholder="Passage HTML or plain text"
+                            ></textarea>
+                          </div>
+
+                          <div class="flex items-center justify-between pt-2">
+                            <div>
+                              <h4 class="text-sm font-semibold uppercase tracking-wide text-gray-700">Question Groups</h4>
+                              <p class="text-sm text-gray-500">Split a section into logical blocks of questions.</p>
+                            </div>
+                            <button
+                              type="button"
+                              (click)="addGroup(skillIndex, sectionIndex)"
+                              class="rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+                            >
+                              Add group
+                            </button>
+                          </div>
+
+                          <div formArrayName="questionGroups" class="space-y-4">
+                            <ng-container *ngIf="groups(skillIndex, sectionIndex).controls.length; else emptyGroups">
+                              <div
+                                *ngFor="let groupControl of groups(skillIndex, sectionIndex).controls; let groupIndex = index; trackBy: trackByIndex"
+                                [formGroupName]="groupIndex"
+                                class="rounded-2xl border border-gray-200 bg-gray-50"
+                              >
+                                <details open>
+                                  <summary class="flex cursor-pointer list-none items-center justify-between gap-4 px-4 py-4">
+                                    <div>
+                                      <p class="text-sm font-semibold text-gray-900">
+                                        {{ groupControl.get('title')?.value || ('Group ' + (groupIndex + 1)) }}
+                                      </p>
+                                      <p class="text-xs text-gray-500">
+                                        {{ questions(skillIndex, sectionIndex, groupIndex).length }} question(s)
+                                      </p>
+                                    </div>
+                                    <button
+                                      type="button"
+                                      (click)="removeGroup(skillIndex, sectionIndex, groupIndex); $event.stopPropagation()"
+                                      class="rounded-lg border border-red-200 bg-white px-3 py-2 text-sm font-medium text-red-600 hover:bg-red-50"
+                                    >
+                                      Remove
+                                    </button>
+                                  </summary>
+
+                                  <div class="border-t border-gray-200 bg-white px-4 py-4 space-y-4">
+                                    <div class="grid grid-cols-1 gap-4 xl:grid-cols-2">
+                                      <div>
+                                        <label class="mb-2 block text-sm font-medium text-gray-700">Group Title</label>
+                                        <input
+                                          type="text"
+                                          formControlName="title"
+                                          class="w-full rounded-xl border border-gray-300 px-4 py-3 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
+                                        />
+                                      </div>
+
+                                      <div>
+                                        <label class="mb-2 block text-sm font-medium text-gray-700">Question Type</label>
+                                        <select
+                                          formControlName="questionType"
+                                          class="w-full rounded-xl border border-gray-300 px-4 py-3 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
+                                        >
+                                          <option *ngFor="let questionType of questionTypes" [value]="questionType">{{ questionType }}</option>
+                                        </select>
+                                      </div>
+
+                                      <div>
+                                        <label class="mb-2 block text-sm font-medium text-gray-700">Instruction</label>
+                                        <textarea
+                                          formControlName="instruction"
+                                          rows="3"
+                                          class="w-full rounded-xl border border-gray-300 px-4 py-3 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
+                                        ></textarea>
+                                      </div>
+
+                                      <div>
+                                        <label class="mb-2 block text-sm font-medium text-gray-700">Group Content</label>
+                                        <textarea
+                                          formControlName="textContent"
+                                          rows="3"
+                                          class="w-full rounded-xl border border-gray-300 px-4 py-3 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
+                                        ></textarea>
+                                      </div>
+
+                                      <div>
+                                        <label class="mb-2 block text-sm font-medium text-gray-700">Image URL</label>
+                                        <input
+                                          type="text"
+                                          formControlName="imageUrl"
+                                          class="w-full rounded-xl border border-gray-300 px-4 py-3 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
+                                        />
+                                      </div>
+
+                                      <div>
+                                        <label class="mb-2 block text-sm font-medium text-gray-700">Audio URL</label>
+                                        <input
+                                          type="text"
+                                          formControlName="audioUrl"
+                                          class="w-full rounded-xl border border-gray-300 px-4 py-3 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
+                                        />
+                                      </div>
+                                    </div>
+
+                                    <div class="flex items-center justify-between pt-2">
+                                      <div>
+                                        <h5 class="text-sm font-semibold uppercase tracking-wide text-gray-700">Questions</h5>
+                                        <p class="text-sm text-gray-500">Store options as JSON for multiple-choice style questions.</p>
+                                      </div>
+                                      <button
+                                        type="button"
+                                        (click)="addQuestion(skillIndex, sectionIndex, groupIndex)"
+                                        class="rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+                                      >
+                                        Add question
+                                      </button>
+                                    </div>
+
+                                    <div formArrayName="questions" class="space-y-4">
+                                      <ng-container *ngIf="questions(skillIndex, sectionIndex, groupIndex).controls.length; else emptyQuestions">
+                                        <div
+                                          *ngFor="let questionControl of questions(skillIndex, sectionIndex, groupIndex).controls; let questionIndex = index; trackBy: trackByIndex"
+                                          [formGroupName]="questionIndex"
+                                          class="rounded-2xl border border-gray-200 bg-gray-50 px-4 py-4"
+                                        >
+                                          <div class="mb-4 flex items-center justify-between">
+                                            <p class="text-sm font-semibold text-gray-900">
+                                              Question {{ questionIndex + 1 }}
+                                            </p>
+                                            <button
+                                              type="button"
+                                              (click)="removeQuestion(skillIndex, sectionIndex, groupIndex, questionIndex)"
+                                              class="rounded-lg border border-red-200 bg-white px-3 py-2 text-sm font-medium text-red-600 hover:bg-red-50"
+                                            >
+                                              Remove
+                                            </button>
+                                          </div>
+
+                                          <div class="grid grid-cols-1 gap-4 xl:grid-cols-4">
+                                            <div class="xl:col-span-3">
+                                              <label class="mb-2 block text-sm font-medium text-gray-700">Question Content</label>
+                                              <textarea
+                                                formControlName="content"
+                                                rows="3"
+                                                class="w-full rounded-xl border border-gray-300 px-4 py-3 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
+                                              ></textarea>
+                                            </div>
+
+                                            <div>
+                                              <label class="mb-2 block text-sm font-medium text-gray-700">Correct Answer</label>
+                                              <input
+                                                type="text"
+                                                formControlName="correctAnswer"
+                                                class="w-full rounded-xl border border-gray-300 px-4 py-3 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
+                                              />
+                                            </div>
+
+                                            <div class="xl:col-span-2">
+                                              <label class="mb-2 block text-sm font-medium text-gray-700">Options JSON</label>
+                                              <textarea
+                                                formControlName="options"
+                                                rows="3"
+                                                class="w-full rounded-xl border border-gray-300 px-4 py-3 font-mono text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
+                                                placeholder='["A", "B", "C", "D"]'
+                                              ></textarea>
+                                            </div>
+
+                                            <div>
+                                              <label class="mb-2 block text-sm font-medium text-gray-700">Points</label>
+                                              <input
+                                                type="number"
+                                                formControlName="points"
+                                                class="w-full rounded-xl border border-gray-300 px-4 py-3 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
+                                              />
+                                            </div>
+
+                                            <div class="xl:col-span-2">
+                                              <label class="mb-2 block text-sm font-medium text-gray-700">Explanation</label>
+                                              <textarea
+                                                formControlName="explanation"
+                                                rows="3"
+                                                class="w-full rounded-xl border border-gray-300 px-4 py-3 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
+                                              ></textarea>
+                                            </div>
+                                          </div>
+                                        </div>
+                                      </ng-container>
+                                    </div>
+                                  </div>
+                                </details>
+                              </div>
+                            </ng-container>
+                          </div>
+                        </div>
+                      </details>
+                    </div>
+                  </ng-container>
+                </div>
+              </div>
+            </details>
+          </div>
+        </ng-container>
+      </div>
+    </section>
+  </form>
+}
+
+<ng-template #emptySkills>
+  <div class="rounded-2xl border-2 border-dashed border-gray-300 bg-gray-50 px-6 py-12 text-center">
+    <p class="text-base font-medium text-gray-900">No skills yet</p>
+    <p class="mt-2 text-sm text-gray-500">Add an IELTS preset or create skills one by one.</p>
+  </div>
+</ng-template>
+
+<ng-template #emptySections>
+  <div class="rounded-xl border border-dashed border-gray-300 px-4 py-6 text-center text-sm text-gray-500">
+    No sections in this skill yet.
+  </div>
+</ng-template>
+
+<ng-template #emptyGroups>
+  <div class="rounded-xl border border-dashed border-gray-300 px-4 py-6 text-center text-sm text-gray-500">
+    No groups in this section yet.
+  </div>
+</ng-template>
+
+<ng-template #emptyQuestions>
+  <div class="rounded-xl border border-dashed border-gray-300 px-4 py-6 text-center text-sm text-gray-500">
+    No questions in this group yet.
+  </div>
+</ng-template>

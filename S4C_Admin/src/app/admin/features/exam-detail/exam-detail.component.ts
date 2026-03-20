@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { ExamsService } from '../../../core/services/exams.service';
@@ -10,14 +10,29 @@ import { QuestionGroupDialogComponent } from '../question-group-dialog/question-
    selector: 'app-exam-detail',
    standalone: true,
    imports: [CommonModule, ReactiveFormsModule, QuestionGroupDialogComponent],
-    template: `
-      @if (exam) {
+   template: `
+      @if (isLoading) {
+        <div class="flex items-center justify-center h-screen bg-gray-50">
+          <div class="text-center">
+            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+            <p class="mt-4 text-gray-600 font-medium">Loading exam details...</p>
+          </div>
+        </div>
+      } @else if (error) {
+        <div class="flex items-center justify-center h-screen bg-gray-50 p-6">
+          <div class="bg-red-50 text-red-700 p-6 rounded-lg max-w-lg shadow-sm border border-red-100">
+            <h3 class="text-lg font-bold mb-2">Error Loading Exam</h3>
+            <p>{{ error }}</p>
+            <button (click)="retryLoad()" class="mt-4 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition">Retry</button>
+          </div>
+        </div>
+      } @else if (exam) {
       <div class="p-6 h-screen flex flex-col">
         <!-- Header -->
         <div class="flex justify-between items-center mb-6">
           <div>
             <h1 class="text-2xl font-bold text-gray-800">{{ exam.title }}</h1>
-            <p class="text-sm text-gray-500">{{ exam.type }} • {{ exam.status }}</p>
+            <p class="text-sm text-gray-500">{{ exam.type }} &bull; {{ exam.status }}</p>
           </div>
           <div>
             <button class="bg-blue-600 text-white px-4 py-2 rounded">Save Changes</button>
@@ -35,7 +50,7 @@ import { QuestionGroupDialogComponent } from '../question-group-dialog/question-
             <nav class="p-2">
               @for (skill of skills; track skill.id) {
               <button 
-                      (click)="selectedSkill = skill; selectedSection = null"
+                      (click)="selectSkill(skill)"
                       [class.bg-blue-50]="selectedSkill?.id === skill.id"
                       class="w-full text-left px-4 py-3 rounded-md hover:bg-gray-50 mb-1 flex justify-between items-center group">
                 <span class="font-medium text-gray-700">{{ skill.title }}</span>
@@ -57,7 +72,7 @@ import { QuestionGroupDialogComponent } from '../question-group-dialog/question-
               <h2 class="text-xl font-bold mb-4">{{ selectedSkill.title }} Sections</h2>
               
               <div class="space-y-4">
-                @for (section of selectedSkill.sections; track section.id) {
+                @for (section of selectedSkill.sections || []; track section.id) {
                 <div class="border rounded-lg p-4 hover:border-blue-300 transition-colors cursor-pointer"
                      (click)="selectedSection = section">
                   <div class="flex justify-between items-start">
@@ -95,7 +110,7 @@ import { QuestionGroupDialogComponent } from '../question-group-dialog/question-
             @if (selectedSection) {
             <div class="flex flex-col h-full">
               <div class="p-4 border-b flex items-center space-x-2">
-                  <button (click)="selectedSection = null" class="text-gray-500 hover:text-gray-700">← Back</button>
+                  <button (click)="selectedSection = null" class="text-gray-500 hover:text-gray-700">&larr; Back</button>
                   <h3 class="font-bold text-lg">{{ selectedSection.title }}</h3>
               </div>
               
@@ -126,11 +141,11 @@ import { QuestionGroupDialogComponent } from '../question-group-dialog/question-
                     
                     <!-- Groups List -->
                     <div class="space-y-6">
-                        @for (group of selectedSection.groups; track group.id || $index) {
+                        @for (group of selectedSection.groups || []; track $index) {
                         <div class="border rounded p-4">
                           <div class="font-semibold text-gray-800 mb-2">{{ group.title }} <span class="text-xs font-normal text-gray-500 ml-2">({{ group.instruction }})</span></div>
                           <div class="space-y-2">
-                              @for (q of group.questions; track q.id || $index) {
+                              @for (q of group.questions || []; track $index) {
                               <div class="flex items-start space-x-2 text-sm">
                                 <div class="font-mono bg-gray-200 px-2 rounded">{{ q.orderIndex }}</div>
                                 <div>{{ q.content || '[No Content]' }} <span class="text-red-600 font-bold ml-2">({{ q.correctAnswer }})</span></div>
@@ -174,7 +189,7 @@ import { QuestionGroupDialogComponent } from '../question-group-dialog/question-
                 </div>
                 <div class="flex justify-end space-x-2">
                     <button type="button" (click)="showCreateSectionModal = false" class="px-4 py-2 border rounded">Cancel</button>
-                    <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded">create</button>
+                    <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded">Create</button>
                 </div>
               </form>
           </div>
@@ -192,9 +207,9 @@ import { QuestionGroupDialogComponent } from '../question-group-dialog/question-
 
       </div>
       }
-    `,
+   `,
 })
-export class ExamDetailComponent {
+export class ExamDetailComponent implements OnInit {
    exam: Exam | null = null;
    skills: ExamSkill[] = [];
    selectedSkill: ExamSkill | null = null;
@@ -202,11 +217,15 @@ export class ExamDetailComponent {
    showCreateSectionModal = false;
    showCreateGroupModal = false;
    sectionForm: FormGroup;
+   isLoading = false;
+   error: string | null = null;
+   private examId: string | null = null;
 
    constructor(
       private route: ActivatedRoute,
       private examsService: ExamsService,
-      private fb: FormBuilder
+      private fb: FormBuilder,
+      private cdr: ChangeDetectorRef
    ) {
       this.sectionForm = this.fb.group({
          title: ['', Validators.required],
@@ -217,19 +236,65 @@ export class ExamDetailComponent {
 
    ngOnInit() {
       const id = this.route.snapshot.paramMap.get('id');
+      console.log('[ExamDetail] ngOnInit, id =', id);
       if (id) {
+         this.examId = id;
          this.loadExam(id);
       }
    }
 
    loadExam(id: string) {
-      this.examsService.getFullExam(id).subscribe(res => {
-         this.exam = res;
-         this.skills = res.skills || [];
-         if (this.skills.length > 0) {
-            this.selectedSkill = this.skills[0];
+      console.log('[ExamDetail] loadExam called, id =', id);
+      this.isLoading = true;
+      this.error = null;
+      this.exam = null;
+
+      this.examsService.getFullExam(id).subscribe({
+         next: (res) => {
+            console.log('[ExamDetail] API response received:', res);
+            if (res) {
+               // Normalize all arrays to prevent @for from crashing on undefined
+               const skills = res.skills || [];
+               skills.forEach(skill => {
+                  skill.sections = skill.sections || [];
+                  skill.sections.forEach(section => {
+                     section.groups = section.groups || [];
+                     section.groups.forEach(group => {
+                        group.questions = group.questions || [];
+                     });
+                  });
+               });
+
+               this.exam = res;
+               this.skills = skills;
+
+               if (this.skills.length > 0) {
+                  this.selectedSkill = this.skills[0];
+               }
+            }
+            this.isLoading = false;
+            console.log('[ExamDetail] isLoading set to false. exam =', this.exam?.title);
+            this.cdr.detectChanges();
+         },
+         error: (err) => {
+            console.error('[ExamDetail] API error:', err);
+            this.error = 'Could not load the exam. Please check the console for details.';
+            this.isLoading = false;
+            this.cdr.detectChanges();
          }
       });
+   }
+
+   retryLoad() {
+      if (this.examId) {
+         this.error = null;
+         this.loadExam(this.examId);
+      }
+   }
+
+   selectSkill(skill: ExamSkill) {
+      this.selectedSkill = skill;
+      this.selectedSection = null;
    }
 
    addSkill() {
@@ -240,7 +305,6 @@ export class ExamDetailComponent {
       if (this.sectionForm.valid && this.selectedSkill) {
          const payload = this.sectionForm.value;
 
-         // Mock update UI
          if (!this.selectedSkill.sections) this.selectedSkill.sections = [];
          this.selectedSkill.sections.push({
             ...payload,

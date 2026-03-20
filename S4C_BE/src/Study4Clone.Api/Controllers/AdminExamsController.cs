@@ -18,6 +18,52 @@ public class AdminExamsController : ControllerBase
         _adminExamService = adminExamService;
     }
 
+    [HttpGet("{id:guid}")]
+    public async Task<ActionResult<AdminExamEditorDto>> GetExamEditor(Guid id, CancellationToken cancellationToken)
+    {
+        var result = await _adminExamService.GetExamEditorAsync(id, cancellationToken);
+        if (!result.IsSuccess)
+        {
+            return NotFound(new { error = result.Error });
+        }
+
+        return Ok(result.Value);
+    }
+
+    [HttpPost]
+    public async Task<ActionResult<AdminExamEditorDto>> CreateExam(
+        [FromBody] AdminExamEditorDto dto,
+        CancellationToken cancellationToken)
+    {
+        var result = await _adminExamService.CreateExamAsync(dto, cancellationToken);
+        if (!result.IsSuccess)
+        {
+            return BadRequest(new { error = result.Error });
+        }
+
+        return CreatedAtAction(nameof(GetExamEditor), new { id = result.Value!.Id }, result.Value);
+    }
+
+    [HttpPut("{id:guid}")]
+    public async Task<ActionResult<AdminExamEditorDto>> UpdateExam(
+        Guid id,
+        [FromBody] AdminExamEditorDto dto,
+        CancellationToken cancellationToken)
+    {
+        var result = await _adminExamService.UpdateExamAsync(id, dto, cancellationToken);
+        if (!result.IsSuccess)
+        {
+            if (result.Error?.Contains("not found", StringComparison.OrdinalIgnoreCase) == true)
+            {
+                return NotFound(new { error = result.Error });
+            }
+
+            return BadRequest(new { error = result.Error });
+        }
+
+        return Ok(result.Value);
+    }
+
     /// <summary>
     /// Import a full exam from JSON
     /// </summary>

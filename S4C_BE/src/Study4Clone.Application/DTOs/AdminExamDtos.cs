@@ -3,6 +3,78 @@ using Study4Clone.Domain.Enums;
 
 namespace Study4Clone.Application.DTOs;
 
+public class AdminExamEditorDto
+{
+    public Guid? Id { get; set; }
+
+    [Required]
+    public string Title { get; set; } = string.Empty;
+
+    public string? Slug { get; set; }
+    public string? Description { get; set; }
+    public string? ThumbnailUrl { get; set; }
+    public ExamType Type { get; set; } = ExamType.IeltsAcademic;
+    public ExamStatus Status { get; set; } = ExamStatus.Draft;
+    public int Duration { get; set; }
+
+    public List<AdminExamSkillEditorDto> Skills { get; set; } = new();
+}
+
+public class AdminExamSkillEditorDto
+{
+    public Guid? Id { get; set; }
+
+    [Required]
+    public string Title { get; set; } = string.Empty;
+
+    public SkillType Skill { get; set; }
+    public int OrderIndex { get; set; }
+    public int Duration { get; set; }
+
+    public List<AdminExamSectionEditorDto> Sections { get; set; } = new();
+}
+
+public class AdminExamSectionEditorDto
+{
+    public Guid? Id { get; set; }
+
+    [Required]
+    public string Title { get; set; } = string.Empty;
+
+    public int OrderIndex { get; set; }
+    public string? AudioUrl { get; set; }
+    public string? TextContent { get; set; }
+    public string? Transcript { get; set; }
+    public string? ImageUrl { get; set; }
+
+    public List<AdminQuestionGroupEditorDto> QuestionGroups { get; set; } = new();
+}
+
+public class AdminQuestionGroupEditorDto
+{
+    public Guid? Id { get; set; }
+    public string? Title { get; set; }
+    public string? Instruction { get; set; }
+    public QuestionType QuestionType { get; set; } = QuestionType.MultipleChoice;
+    public int OrderIndex { get; set; }
+    public string? ImageUrl { get; set; }
+    public string? TextContent { get; set; }
+    public string? AudioUrl { get; set; }
+
+    public List<AdminQuestionEditorDto> Questions { get; set; } = new();
+}
+
+public class AdminQuestionEditorDto
+{
+    public Guid? Id { get; set; }
+    public int OrderIndex { get; set; }
+    public string? Content { get; set; }
+    public string? Options { get; set; }
+    public string CorrectAnswer { get; set; } = string.Empty;
+    public double Points { get; set; } = 1.0;
+    public string? Explanation { get; set; }
+}
+
 public class ExamImportDto
 {
     [Required]

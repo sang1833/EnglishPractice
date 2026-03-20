@@ -185,6 +185,60 @@ export interface Exam {
     attempts?: TestAttempt[];
 }
 
+export interface AdminExamEditorDto {
+    id?: string | null;
+    title: string;
+    slug?: string | null;
+    description?: string | null;
+    thumbnailUrl?: string | null;
+    type: ExamType;
+    status: ExamStatus;
+    duration: number;
+    skills: AdminExamSkillEditorDto[];
+}
+
+export interface AdminExamSkillEditorDto {
+    id?: string | null;
+    title: string;
+    skill: SkillType;
+    orderIndex: number;
+    duration: number;
+    sections: AdminExamSectionEditorDto[];
+}
+
+export interface AdminExamSectionEditorDto {
+    id?: string | null;
+    title: string;
+    orderIndex: number;
+    audioUrl?: string | null;
+    textContent?: string | null;
+    transcript?: string | null;
+    imageUrl?: string | null;
+    questionGroups: AdminQuestionGroupEditorDto[];
+}
+
+export interface AdminQuestionGroupEditorDto {
+    id?: string | null;
+    title?: string | null;
+    instruction?: string | null;
+    questionType: QuestionType;
+    orderIndex: number;
+    imageUrl?: string | null;
+    textContent?: string | null;
+    audioUrl?: string | null;
+    questions: AdminQuestionEditorDto[];
+}
+
+export interface AdminQuestionEditorDto {
+    id?: string | null;
+    orderIndex: number;
+    content?: string | null;
+    options?: string | null;
+    correctAnswer: string;
+    points: number;
+    explanation?: string | null;
+}
+
 export interface TestAttempt {
     id?: string;
     userId?: string;

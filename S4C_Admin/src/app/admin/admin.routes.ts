@@ -17,9 +17,9 @@ export const ADMIN_ROUTES: Routes = [
             { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
             { path: 'dashboard', component: DashboardComponent },
             { path: 'exams', loadComponent: () => import('./features/exam-list/exam-list.component').then(m => m.ExamListComponent) },
-            { path: 'exams/:id', loadComponent: () => import('./features/exam-detail/exam-detail.component').then(m => m.ExamDetailComponent) },
+            { path: 'exams/:id', loadComponent: () => import('./features/exam-editor/exam-editor.component').then(m => m.ExamEditorComponent) },
             { path: 'import', loadComponent: () => import('./features/exam-import/exam-import.component').then(m => m.ExamImportComponent) },
-            { path: 'create', loadComponent: () => import('./features/exam-wizard/exam-wizard.component').then(m => m.ExamWizardComponent) },
+            { path: 'create', loadComponent: () => import('./features/exam-editor/exam-editor.component').then(m => m.ExamEditorComponent) },
         ]
     }
 ];

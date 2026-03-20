@@ -1,7 +1,16 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { CreateExamRequest, ExamDto, ExamListDto, PagedList, LoginResponse, ExamSkill, ExamSection, Exam } from '../models/api.models';
+import {
+    AdminExamEditorDto,
+    CreateExamRequest,
+    Exam,
+    ExamDto,
+    ExamListDto,
+    ExamSection,
+    ExamSkill,
+    PagedList
+} from '../models/api.models';
 import { environment } from '../../../environments/environment';
 
 const API_URL = environment.apiUrl;
@@ -31,8 +40,20 @@ export class ExamsService {
         return this.http.get<Exam>(`${API_URL}/Exams/${id}/full`);
     }
 
+    getAdminExam(id: string): Observable<AdminExamEditorDto> {
+        return this.http.get<AdminExamEditorDto>(`${API_URL}/admin/exams/${id}`);
+    }
+
     createExam(data: CreateExamRequest): Observable<ExamDto> {
         return this.http.post<ExamDto>(`${API_URL}/Exams`, data);
+    }
+
+    createAdminExam(data: AdminExamEditorDto): Observable<AdminExamEditorDto> {
+        return this.http.post<AdminExamEditorDto>(`${API_URL}/admin/exams`, data);
+    }
+
+    updateAdminExam(id: string, data: AdminExamEditorDto): Observable<AdminExamEditorDto> {
+        return this.http.put<AdminExamEditorDto>(`${API_URL}/admin/exams/${id}`, data);
     }
 
     importExam(data: any): Observable<any> {

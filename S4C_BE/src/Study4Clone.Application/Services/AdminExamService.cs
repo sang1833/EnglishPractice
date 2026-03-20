@@ -1,3 +1,4 @@
+using System.Text;
 using Study4Clone.Application.Common;
 using Study4Clone.Application.DTOs;
 using Study4Clone.Application.Interfaces;
@@ -14,182 +15,87 @@ public class AdminExamService : IAdminExamService
         _unitOfWork = unitOfWork;
     }
 
-    public async Task<Result<Guid>> ImportExamAsync(ExamImportDto dto, CancellationToken cancellationToken = default)
+    public async Task<Result<AdminExamEditorDto>> GetExamEditorAsync(Guid id, CancellationToken cancellationToken = default)
     {
+        var exam = await _unitOfWork.Exams.GetFullExamAsync(id, cancellationToken);
+        if (exam is null)
+        {
+            return Result<AdminExamEditorDto>.Failure($"Exam with ID {id} not found.");
+        }
+
+        return Result<AdminExamEditorDto>.Success(MapExam(exam));
+    }
+
+    public async Task<Result<AdminExamEditorDto>> CreateExamAsync(AdminExamEditorDto dto, CancellationToken cancellationToken = default)
+    {
+        await _unitOfWork.BeginTransactionAsync(cancellationToken);
+
         try
         {
-            // 1. Map Exam (Root)
             var exam = new Exam
             {
                 Id = Guid.NewGuid(),
-                Title = dto.Title,
-                Slug = !string.IsNullOrWhiteSpace(dto.Slug) ? dto.Slug : GenerateSlug(dto.Title),
-                Description = dto.Description,
-                ThumbnailUrl = dto.ThumbnailUrl,
-                Type = dto.Type,
-                Status = dto.Status,
-                Duration = dto.Duration,
-                CreatedAt = DateTime.UtcNow,
-                UpdatedAt = DateTime.UtcNow
+                CreatedAt = DateTime.UtcNow
             };
 
-            // 2. Map Skills
-            foreach (var skillDto in dto.Skills)
-            {
-                var skill = new ExamSkill
-                {
-                    Id = Guid.NewGuid(),
-                    ExamId = exam.Id,
-                    Title = skillDto.Title,
-                    Skill = skillDto.Skill,
-                    OrderIndex = skillDto.OrderIndex,
-                    Duration = skillDto.Duration
-                };
-                exam.Skills.Add(skill);
-
-                // 3. Map Sections
-                foreach (var sectionDto in skillDto.Sections)
-                {
-                    var section = new ExamSection
-                    {
-                        Id = Guid.NewGuid(),
-                        SkillId = skill.Id,
-                        Title = sectionDto.Title,
-                        OrderIndex = sectionDto.OrderIndex,
-                        AudioUrl = sectionDto.AudioUrl,
-                        TextContent = sectionDto.TextContent,
-                        Transcript = sectionDto.Transcript,
-                        ImageUrl = sectionDto.ImageUrl
-                    };
-                    // Note: ExamSkill doesn't have a Sections collection in the Entity definition shown earlier?
-                    // Let's check the ExamSkill entity definition. 
-                    // Assuming I need to add them to Context directly or via navigation property if it exists.
-                    // If navigation property 'Sections' exists on ExamSkill, we add to it.
-                    // If not, we rely on the fact that we will add them to the context.
-                    // Wait, standard EF Core graph adding requires navigation properties.
-                    // Converting to List<ExamSection> locally if needed, but let's assume standard graph.
-                    // However, to be safe and explicit, let's create the collections.
-                    
-                    // CRITICAL: Need to verify if ExamSkill has ICollection<ExamSection>. 
-                    // Based on previous file reads, I haven't seen ExamSkill.cs but I saw DataSeeder adding them separately.
-                    // DataSeeder added them via _context.ExamSections.AddRangeAsync.
-                    // Here we can do the same if we have access to repositories for each, OR we trust EF Core Fixup.
-                    // But IUnitOfWork typically has repositories. IUnitOfWork.Exams is generic or specific?
-                    // IUnitOfWork definition showed: IExamRepository Exams, IUserRepository Users, etc.
-                    // It didn't show generic repos for Skills/Sections.
-                    // So I might need to rely on the Exam.Skills navigation + Cascade insert.
-                    // BUT, if ExamSkill doesn't have "Sections" navigation, I can't chain it down.
-                    // Let's assume I need to check ExamSkill.cs. 
-                    // For now, I'll write the code assuming the navigation exists or I'll persist the root and then children if needed.
-                    // Actually, safest is to instantiate them and let EF Core handle it if the navigation exists.
-                    // If navigation is missing, I MUST add them to a collection to Save.
-                    
-                    // Let's optimistically assume ICollection<ExamSection> Sections exists on ExamSkill 
-                    // and ICollection<QuestionGroup> QuestionGroups exists on ExamSection, etc.
-                    // If not, I will get a compiler error and fix it.
-                    
-                    // Ref: DataSeeder used separate AddRangeAsync calls. This implies maybe navigations aren't fully relied upon or just style.
-                    // Let's verify ExamSkill.cs after this if needed, but for now I'll generate the code.
-                    // To avoid 'Property does not exist' error, I'll assume they MIGHT not exist and build a flat list to save if I can access the context/repo.
-                    // But I only have IUnitOfWork.Exams. 
-                    // If IUnitOfWork doesn't expose other repos, I MUST rely on the Graph.
-                    // So I will assume the Graph is set up correctly (Entities have collections).
-                    
-                    // Re-checking Exam.cs... 
-                    // public virtual ICollection<ExamSkill> Skills { get; set; } = new List<ExamSkill>(); -> YES.
-                    
-                    // So if ExamSkill has Sections, and ExamSection has QuestionGroups...
-                    // I will write the code as if they do.
-                    
-                    // To allow this code to compile even if I'm wrong, I'll rely on the properties.
-                    // If they fail, I'll fix Entity definitions.
-                    
-                   // skill.Sections.Add(section); // UNCOMMENTING THIS WOULD BE RISKY WITHOUT CHECKING.
-                   // Instead, let's look at how DataSeeder worked. It created objects and added them to Context.
-                   // I don't have direct Context access here, only UnitOfWork.
-                   // Does UnitOfWork expose the Context? usually no.
-                   // Does UnitOfWork expose a generic Repository? 
-                   // IUnitOfWork.cs: IRepository<Domain.Entities.UserAnswer> UserAnswers { get; }
-                   // It does NOT show generic repo for all types.
-                   
-                   // ACTION: I will assume the navigation properties exist as per standard DDD/EF Core practices.
-                   // If they don't, I will have to add them to the Entities in a subsequent step.
-                   
-                   // ... (Continuing mapping)
-                   
-                   // 4. Map Groups
-                   foreach (var groupDto in sectionDto.QuestionGroups)
-                   {
-                       var group = new QuestionGroup
-                       {
-                           Id = Guid.NewGuid(),
-                           SectionId = section.Id,
-                           Title = groupDto.Title,
-                           Instruction = groupDto.Instruction,
-                           QuestionType = groupDto.QuestionType,
-                           OrderIndex = groupDto.OrderIndex,
-                           ImageUrl = groupDto.ImageUrl,
-                           TextContent = groupDto.TextContent,
-                           AudioUrl = groupDto.AudioUrl
-                       };
-                       // section.QuestionGroups.Add(group); // Assuming navigation
-                       
-                       // 5. Map Questions
-                       foreach (var qDto in groupDto.Questions)
-                       {
-                           var question = new Question
-                           {
-                               Id = Guid.NewGuid(),
-                               GroupId = group.Id,
-                               OrderIndex = qDto.OrderIndex,
-                               Content = qDto.Content,
-                               Options = qDto.Options,
-                               CorrectAnswer = qDto.CorrectAnswer,
-                               Points = qDto.Points,
-                               Explanation = qDto.Explanation
-                           };
-                           // group.Questions.Add(question); // Assuming navigation
-                           
-                           // ADDING TO PARENT collection manually for now
-                           if (group.Questions == null) group.Questions = new List<Question>();
-                           group.Questions.Add(question);
-                       }
-                       
-                        if (section.Groups == null) section.Groups = new List<QuestionGroup>();
-                        section.Groups.Add(group);
-                    }
-                    
-                    if (skill.Sections == null) skill.Sections = new List<ExamSection>();
-                    skill.Sections.Add(section);
-                }
-            }
-
+            await ApplyExamAsync(exam, dto, cancellationToken);
             await _unitOfWork.Exams.AddAsync(exam, cancellationToken);
             await _unitOfWork.SaveChangesAsync(cancellationToken);
+            await _unitOfWork.CommitTransactionAsync(cancellationToken);
 
-            return Result<Guid>.Success(exam.Id);
+            return Result<AdminExamEditorDto>.Success(MapExam(exam));
         }
         catch (Exception ex)
         {
-            return Result<Guid>.Failure($"Import failed: {ex.Message}");
+            await SafeRollbackAsync(cancellationToken);
+            return Result<AdminExamEditorDto>.Failure($"Create exam failed: {ex.Message}");
         }
     }
 
-    private string GenerateSlug(string title)
+    public async Task<Result<AdminExamEditorDto>> UpdateExamAsync(Guid id, AdminExamEditorDto dto, CancellationToken cancellationToken = default)
     {
-        return title.ToLower().Replace(" ", "-").Replace(",", "").Replace(".", "");
+        var exam = await _unitOfWork.Exams.GetFullExamAsync(id, cancellationToken);
+        if (exam is null)
+        {
+            return Result<AdminExamEditorDto>.Failure($"Exam with ID {id} not found.");
+        }
+
+        await _unitOfWork.BeginTransactionAsync(cancellationToken);
+
+        try
+        {
+            await ApplyExamAsync(exam, dto, cancellationToken);
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
+            await _unitOfWork.CommitTransactionAsync(cancellationToken);
+
+            return Result<AdminExamEditorDto>.Success(MapExam(exam));
+        }
+        catch (Exception ex)
+        {
+            await SafeRollbackAsync(cancellationToken);
+            return Result<AdminExamEditorDto>.Failure($"Update exam failed: {ex.Message}");
+        }
+    }
+
+    public async Task<Result<Guid>> ImportExamAsync(ExamImportDto dto, CancellationToken cancellationToken = default)
+    {
+        var createResult = await CreateExamAsync(MapImport(dto), cancellationToken);
+        if (!createResult.IsSuccess || createResult.Value?.Id is null)
+        {
+            return Result<Guid>.Failure(createResult.Error ?? "Import failed.");
+        }
+
+        return Result<Guid>.Success(createResult.Value.Id.Value);
     }
 
     public async Task<Result<Guid>> CreateQuestionGroupAsync(QuestionGroupCreateDto dto, CancellationToken cancellationToken = default)
     {
-        // 1. Verify Section exists
         var section = await _unitOfWork.ExamSections.GetByIdAsync(dto.SectionId, cancellationToken);
         if (section == null)
         {
             return Result<Guid>.Failure($"Section with ID {dto.SectionId} not found.");
         }
 
-        // 2. Create Group
         var group = new QuestionGroup
         {
             Id = Guid.NewGuid(),
@@ -203,7 +109,6 @@ public class AdminExamService : IAdminExamService
             AudioUrl = dto.AudioUrl
         };
 
-        // 3. Save
         await _unitOfWork.QuestionGroups.AddAsync(group, cancellationToken);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
 
@@ -212,35 +117,419 @@ public class AdminExamService : IAdminExamService
 
     public async Task<Result<Unit>> UpdateQuestionGroupAsync(Guid id, QuestionGroupUpdateDto dto, CancellationToken cancellationToken = default)
     {
-        // 1. Get Group
         var group = await _unitOfWork.QuestionGroups.GetByIdAsync(id, cancellationToken);
         if (group == null)
         {
             return Result<Unit>.Failure($"Question group with ID {id} not found.");
         }
 
-        // 2. Update fields if provided (null checks if applicable, strings can be updated to empty)
-        // Note: For nullable strings, we might want to distinguish "no update" vs "clear value".
-        // However, standard simplified PUT usually replaces. PATCH is better for partial.
-        // Given the DTO structure, if they send null, we might ignore it or clear it.
-        // Let's assume standard "update if not null" for simplicity, or "replace" if PUT.
-        // User request implied "update". Let's stick to "Update provided fields" logic.
-        
-        if (dto.Title != null) group.Title = dto.Title;
-        if (dto.Instruction != null) group.Instruction = dto.Instruction;
-        
-        // OrderIndex is int, presumably always sent or default 0. Let's update it.
+        if (dto.Title != null)
+        {
+            group.Title = dto.Title;
+        }
+
+        if (dto.Instruction != null)
+        {
+            group.Instruction = dto.Instruction;
+        }
+
         group.OrderIndex = dto.OrderIndex;
 
-        // Media fields
-        if (dto.ImageUrl != null) group.ImageUrl = dto.ImageUrl;
-        if (dto.TextContent != null) group.TextContent = dto.TextContent;
-        if (dto.AudioUrl != null) group.AudioUrl = dto.AudioUrl;
+        if (dto.ImageUrl != null)
+        {
+            group.ImageUrl = dto.ImageUrl;
+        }
 
-        // 3. Save
+        if (dto.TextContent != null)
+        {
+            group.TextContent = dto.TextContent;
+        }
+
+        if (dto.AudioUrl != null)
+        {
+            group.AudioUrl = dto.AudioUrl;
+        }
+
         await _unitOfWork.QuestionGroups.UpdateAsync(group, cancellationToken);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
 
         return Result<Unit>.Success(Unit.Value);
+    }
+
+    private async Task ApplyExamAsync(Exam exam, AdminExamEditorDto dto, CancellationToken cancellationToken)
+    {
+        var title = dto.Title.Trim();
+        if (string.IsNullOrWhiteSpace(title))
+        {
+            throw new InvalidOperationException("Exam title is required.");
+        }
+
+        exam.Title = title;
+        exam.Slug = await GenerateUniqueSlugAsync(dto.Slug, title, exam.Id, cancellationToken);
+        exam.Description = NormalizeNullable(dto.Description);
+        exam.ThumbnailUrl = NormalizeNullable(dto.ThumbnailUrl);
+        exam.Type = dto.Type;
+        exam.Status = dto.Status;
+        exam.Duration = dto.Duration;
+        exam.UpdatedAt = DateTime.UtcNow;
+
+        SyncSkills(exam, dto.Skills);
+    }
+
+    private static void SyncSkills(Exam exam, IEnumerable<AdminExamSkillEditorDto> incomingSkills)
+    {
+        SyncChildren(
+            exam.Skills,
+            incomingSkills,
+            skill => skill.Id,
+            dto => CreateSkill(exam.Id, dto),
+            ApplySkill);
+    }
+
+    private static void SyncSections(ExamSkill skill, IEnumerable<AdminExamSectionEditorDto> incomingSections)
+    {
+        SyncChildren(
+            skill.Sections,
+            incomingSections,
+            section => section.Id,
+            dto => CreateSection(skill.Id, dto),
+            ApplySection);
+    }
+
+    private static void SyncGroups(ExamSection section, IEnumerable<AdminQuestionGroupEditorDto> incomingGroups)
+    {
+        SyncChildren(
+            section.Groups,
+            incomingGroups,
+            group => group.Id,
+            dto => CreateGroup(section.Id, dto),
+            ApplyGroup);
+    }
+
+    private static void SyncQuestions(QuestionGroup group, IEnumerable<AdminQuestionEditorDto> incomingQuestions)
+    {
+        SyncChildren(
+            group.Questions,
+            incomingQuestions,
+            question => question.Id,
+            CreateQuestion,
+            ApplyQuestion);
+    }
+
+    private static void SyncChildren<TEntity, TDto>(
+        ICollection<TEntity> target,
+        IEnumerable<TDto> incoming,
+        Func<TEntity, Guid> getId,
+        Func<TDto, TEntity> create,
+        Action<TEntity, TDto> apply)
+        where TEntity : class
+    {
+        var items = incoming.ToList();
+        var existingById = target.ToDictionary(getId);
+        var seenIds = new HashSet<Guid>();
+
+        foreach (var dto in items)
+        {
+            var dtoId = GetDtoId(dto);
+            TEntity entity;
+
+            if (dtoId.HasValue && existingById.TryGetValue(dtoId.Value, out var existing))
+            {
+                entity = existing;
+                seenIds.Add(dtoId.Value);
+            }
+            else
+            {
+                entity = create(dto);
+                target.Add(entity);
+                seenIds.Add(getId(entity));
+            }
+
+            apply(entity, dto);
+        }
+
+        foreach (var existing in target.ToList())
+        {
+            if (!seenIds.Contains(getId(existing)))
+            {
+                target.Remove(existing);
+            }
+        }
+    }
+
+    private static Guid? GetDtoId<TDto>(TDto dto)
+    {
+        return dto switch
+        {
+            AdminExamSkillEditorDto skill => NormalizeId(skill.Id),
+            AdminExamSectionEditorDto section => NormalizeId(section.Id),
+            AdminQuestionGroupEditorDto group => NormalizeId(group.Id),
+            AdminQuestionEditorDto question => NormalizeId(question.Id),
+            _ => null
+        };
+    }
+
+    private static Guid? NormalizeId(Guid? id)
+    {
+        return id.HasValue && id.Value != Guid.Empty ? id : null;
+    }
+
+    private static ExamSkill CreateSkill(Guid examId, AdminExamSkillEditorDto dto)
+    {
+        return new ExamSkill
+        {
+            Id = NormalizeId(dto.Id) ?? Guid.NewGuid(),
+            ExamId = examId
+        };
+    }
+
+    private static void ApplySkill(ExamSkill skill, AdminExamSkillEditorDto dto)
+    {
+        skill.Title = dto.Title.Trim();
+        skill.Skill = dto.Skill;
+        skill.OrderIndex = dto.OrderIndex;
+        skill.Duration = dto.Duration;
+
+        SyncSections(skill, dto.Sections);
+    }
+
+    private static ExamSection CreateSection(Guid skillId, AdminExamSectionEditorDto dto)
+    {
+        return new ExamSection
+        {
+            Id = NormalizeId(dto.Id) ?? Guid.NewGuid(),
+            SkillId = skillId
+        };
+    }
+
+    private static void ApplySection(ExamSection section, AdminExamSectionEditorDto dto)
+    {
+        section.Title = dto.Title.Trim();
+        section.OrderIndex = dto.OrderIndex;
+        section.AudioUrl = NormalizeNullable(dto.AudioUrl);
+        section.TextContent = NormalizeNullable(dto.TextContent);
+        section.Transcript = NormalizeNullable(dto.Transcript);
+        section.ImageUrl = NormalizeNullable(dto.ImageUrl);
+
+        SyncGroups(section, dto.QuestionGroups);
+    }
+
+    private static QuestionGroup CreateGroup(Guid sectionId, AdminQuestionGroupEditorDto dto)
+    {
+        return new QuestionGroup
+        {
+            Id = NormalizeId(dto.Id) ?? Guid.NewGuid(),
+            SectionId = sectionId
+        };
+    }
+
+    private static void ApplyGroup(QuestionGroup group, AdminQuestionGroupEditorDto dto)
+    {
+        group.Title = NormalizeNullable(dto.Title);
+        group.Instruction = NormalizeNullable(dto.Instruction);
+        group.QuestionType = dto.QuestionType;
+        group.OrderIndex = dto.OrderIndex;
+        group.ImageUrl = NormalizeNullable(dto.ImageUrl);
+        group.TextContent = NormalizeNullable(dto.TextContent);
+        group.AudioUrl = NormalizeNullable(dto.AudioUrl);
+
+        SyncQuestions(group, dto.Questions);
+    }
+
+    private static Question CreateQuestion(AdminQuestionEditorDto dto)
+    {
+        return new Question
+        {
+            Id = NormalizeId(dto.Id) ?? Guid.NewGuid()
+        };
+    }
+
+    private static void ApplyQuestion(Question question, AdminQuestionEditorDto dto)
+    {
+        question.OrderIndex = dto.OrderIndex;
+        question.Content = NormalizeNullable(dto.Content);
+        question.Options = NormalizeNullable(dto.Options);
+        question.CorrectAnswer = dto.CorrectAnswer.Trim();
+        question.Explanation = NormalizeNullable(dto.Explanation);
+        question.Points = dto.Points;
+    }
+
+    private async Task<string> GenerateUniqueSlugAsync(
+        string? requestedSlug,
+        string title,
+        Guid currentExamId,
+        CancellationToken cancellationToken)
+    {
+        var baseSlug = NormalizeSlug(string.IsNullOrWhiteSpace(requestedSlug) ? title : requestedSlug);
+        if (string.IsNullOrWhiteSpace(baseSlug))
+        {
+            baseSlug = $"exam-{Guid.NewGuid():N}"[..13];
+        }
+
+        var slug = baseSlug;
+        var suffix = 2;
+
+        while (true)
+        {
+            var existing = await _unitOfWork.Exams.GetBySlugAsync(slug, cancellationToken);
+            if (existing is null || existing.Id == currentExamId)
+            {
+                return slug;
+            }
+
+            slug = $"{baseSlug}-{suffix++}";
+        }
+    }
+
+    private static string NormalizeSlug(string value)
+    {
+        var builder = new StringBuilder();
+        var previousDash = false;
+
+        foreach (var ch in value.Trim().ToLowerInvariant())
+        {
+            if (char.IsLetterOrDigit(ch))
+            {
+                builder.Append(ch);
+                previousDash = false;
+                continue;
+            }
+
+            if (!previousDash)
+            {
+                builder.Append('-');
+                previousDash = true;
+            }
+        }
+
+        return builder.ToString().Trim('-');
+    }
+
+    private static string? NormalizeNullable(string? value)
+    {
+        return string.IsNullOrWhiteSpace(value) ? null : value.Trim();
+    }
+
+    private static AdminExamEditorDto MapImport(ExamImportDto dto)
+    {
+        return new AdminExamEditorDto
+        {
+            Title = dto.Title,
+            Slug = dto.Slug,
+            Description = dto.Description,
+            ThumbnailUrl = dto.ThumbnailUrl,
+            Type = dto.Type,
+            Status = dto.Status,
+            Duration = dto.Duration,
+            Skills = dto.Skills.Select(skill => new AdminExamSkillEditorDto
+            {
+                Title = skill.Title,
+                Skill = skill.Skill,
+                OrderIndex = skill.OrderIndex,
+                Duration = skill.Duration,
+                Sections = skill.Sections.Select(section => new AdminExamSectionEditorDto
+                {
+                    Title = section.Title,
+                    OrderIndex = section.OrderIndex,
+                    AudioUrl = section.AudioUrl,
+                    TextContent = section.TextContent,
+                    Transcript = section.Transcript,
+                    ImageUrl = section.ImageUrl,
+                    QuestionGroups = section.QuestionGroups.Select(group => new AdminQuestionGroupEditorDto
+                    {
+                        Title = group.Title,
+                        Instruction = group.Instruction,
+                        QuestionType = group.QuestionType,
+                        OrderIndex = group.OrderIndex,
+                        ImageUrl = group.ImageUrl,
+                        TextContent = group.TextContent,
+                        AudioUrl = group.AudioUrl,
+                        Questions = group.Questions.Select(question => new AdminQuestionEditorDto
+                        {
+                            OrderIndex = question.OrderIndex,
+                            Content = question.Content,
+                            Options = question.Options,
+                            CorrectAnswer = question.CorrectAnswer ?? string.Empty,
+                            Points = question.Points,
+                            Explanation = question.Explanation
+                        }).ToList()
+                    }).ToList()
+                }).ToList()
+            }).ToList()
+        };
+    }
+
+    private static AdminExamEditorDto MapExam(Exam exam)
+    {
+        return new AdminExamEditorDto
+        {
+            Id = exam.Id,
+            Title = exam.Title,
+            Slug = exam.Slug,
+            Description = exam.Description,
+            ThumbnailUrl = exam.ThumbnailUrl,
+            Type = exam.Type,
+            Status = exam.Status,
+            Duration = exam.Duration,
+            Skills = exam.Skills
+                .OrderBy(skill => skill.OrderIndex)
+                .Select(skill => new AdminExamSkillEditorDto
+                {
+                    Id = skill.Id,
+                    Title = skill.Title,
+                    Skill = skill.Skill,
+                    OrderIndex = skill.OrderIndex,
+                    Duration = skill.Duration,
+                    Sections = skill.Sections
+                        .OrderBy(section => section.OrderIndex)
+                        .Select(section => new AdminExamSectionEditorDto
+                        {
+                            Id = section.Id,
+                            Title = section.Title,
+                            OrderIndex = section.OrderIndex,
+                            AudioUrl = section.AudioUrl,
+                            TextContent = section.TextContent,
+                            Transcript = section.Transcript,
+                            ImageUrl = section.ImageUrl,
+                            QuestionGroups = section.Groups
+                                .OrderBy(group => group.OrderIndex)
+                                .Select(group => new AdminQuestionGroupEditorDto
+                                {
+                                    Id = group.Id,
+                                    Title = group.Title,
+                                    Instruction = group.Instruction,
+                                    QuestionType = group.QuestionType,
+                                    OrderIndex = group.OrderIndex,
+                                    ImageUrl = group.ImageUrl,
+                                    TextContent = group.TextContent,
+                                    AudioUrl = group.AudioUrl,
+                                    Questions = group.Questions
+                                        .OrderBy(question => question.OrderIndex)
+                                        .Select(question => new AdminQuestionEditorDto
+                                        {
+                                            Id = question.Id,
+                                            OrderIndex = question.OrderIndex,
+                                            Content = question.Content,
+                                            Options = question.Options,
+                                            CorrectAnswer = question.CorrectAnswer,
+                                            Points = question.Points,
+                                            Explanation = question.Explanation
+                                        }).ToList()
+                                }).ToList()
+                        }).ToList()
+                }).ToList()
+        };
+    }
+
+    private async Task SafeRollbackAsync(CancellationToken cancellationToken)
+    {
+        try
+        {
+            await _unitOfWork.RollbackTransactionAsync(cancellationToken);
+        }
+        catch
+        {
+            // Ignore rollback errors so the original failure can surface.
+        }
     }
 }
